@@ -4,256 +4,344 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KisanSetu | Direct Farm-to-Fork Marketplace & Farmer Portal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet Map CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        /* Custom scrollbar for chat and modals */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .chat-bubble { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col justify-between">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-seedling text-2xl text-emerald-300"></i>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight">KisanSetu Portal</h1>
-                    <p class="text-xs text-emerald-200">Dept. of Consumer Affairs (DoCA) • Problem ID26033</p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2 items-center">
-                <button onclick="switchTab(this, 'marketplace')" class="tab-btn px-3 py-2 rounded-lg font-medium text-sm transition bg-emerald-700 text-white">Buyer Market</button>
-                <button onclick="switchTab(this, 'farmer')" class="tab-btn px-3 py-2 rounded-lg font-medium text-sm transition text-emerald-100 hover:bg-emerald-700">Farmer Desk</button>
-                <button onclick="switchTab(this, 'logistics')" class="tab-btn px-3 py-2 rounded-lg font-medium text-sm transition text-emerald-100 hover:bg-emerald-700">AI Route Engine</button>
-                <button onclick="switchTab(this, 'analytics')" class="tab-btn px-3 py-2 rounded-lg font-medium text-sm transition text-emerald-100 hover:bg-emerald-700">Demand Forecast</button>
-            </div>
-
-            <div id="auth-container" class="flex items-center space-x-2"></div>
-        </div>
-    </header>
-
-    <!-- Sub-banner -->
-    <section class="bg-emerald-900 text-white border-b border-emerald-700 py-3">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-                <p class="text-xs text-emerald-300 uppercase font-semibold">Farmer Realization</p>
-                <p class="text-lg font-bold text-emerald-100">+20% to +30% Above Mandi</p>
-            </div>
-            <div>
-                <p class="text-xs text-emerald-300 uppercase font-semibold">Consumer Savings</p>
-                <p class="text-lg font-bold text-emerald-100">15% to 25% Off Retail</p>
-            </div>
-            <div>
-                <p class="text-xs text-emerald-300 uppercase font-semibold">Intermediary Markup</p>
-                <p class="text-lg font-bold text-amber-300">0% Commission Extracted</p>
-            </div>
-            <div>
-                <p class="text-xs text-emerald-300 uppercase font-semibold">Logistics Efficiency</p>
-                <p class="text-lg font-bold text-emerald-100">First-Mile CVRP Clustering</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6">
-
-        <!-- TAB 1: BUYER MARKETPLACE -->
-        <section id="marketplace-tab" class="tab-content">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">Direct Farm Catalog</h2>
-                    <p class="text-sm text-slate-500">Buy fresh farm harvests directly with transparent price corridors.</p>
-                </div>
-                <div class="bg-white border rounded-lg px-3 py-1.5 flex items-center shadow-sm">
-                    <i class="fa-solid fa-filter text-slate-400 mr-2 text-sm"></i>
-                    <select id="filter-crop" onchange="renderMarketplace()" class="text-sm border-none outline-none bg-transparent">
-                        <option value="All">All Produce</option>
-                        <option value="Tomato">Tomato</option>
-                        <option value="Onion">Onion</option>
-                        <option value="Capsicum">Capsicum</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-        </section>
-
-        <!-- TAB 2: FARMER DESK -->
-        <section id="farmer-tab" class="tab-content hidden">
-            <div id="login-prompt-banner" class="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="flex items-center space-x-3 text-amber-900">
-                    <i class="fa-solid fa-triangle-exclamation text-xl text-amber-600"></i>
-                    <div>
-                        <p class="font-bold text-sm">Farmer Authentication Required to Publish Harvests</p>
-                        <p class="text-xs text-amber-700">Please log in using your Kisan ID / Mobile number to list inventory.</p>
-                    </div>
-                </div>
-                <button onclick="openLoginModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">
-                    <i class="fa-solid fa-right-to-bracket mr-1.5"></i>Login as Farmer
-                </button>
-            </div>
-
-            <div id="logged-in-profile" class="hidden mb-6 p-5 bg-white border border-emerald-200 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-800 text-xl font-bold">
-                        <i class="fa-solid fa-user-check"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h3 id="profile-name" class="font-bold text-slate-800 text-base"></h3>
-                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">e-KYC Verified</span>
-                        </div>
-                        <p id="profile-fpo" class="text-xs text-slate-500"></p>
-                    </div>
-                </div>
+    <div>
+        <!-- Top Navigation Header -->
+        <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
                 <div class="flex items-center space-x-3">
-                    <button onclick="openFarmerMyListingsModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
-                        <i class="fa-solid fa-boxes-stacked mr-1.5"></i>My Listings (<span id="my-listings-count">0</span>)
-                    </button>
-                    <button onclick="logoutFarmer()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition">
-                        <i class="fa-solid fa-power-off mr-1"></i>Sign Out
-                    </button>
-                </div>
-            </div>
-
-            <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow border border-slate-200">
-                <div class="mb-6 border-b pb-4">
-                    <h2 class="text-2xl font-bold text-slate-800 flex items-center">
-                        <i class="fa-solid fa-tractor mr-3 text-emerald-600"></i>List Harvest Batch
-                    </h2>
-                    <p class="text-sm text-slate-500 mt-1">Publish produce lots directly to bulk buyers and consumer clusters.</p>
-                </div>
-
-                <form id="farmerForm" onsubmit="submitListing(event)" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Farmer / Lead Name</label>
-                            <input type="text" id="f_name" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Ramesh Patil">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">FPO Name</label>
-                            <input type="text" id="f_fpo" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Nashik Agro FPO">
-                        </div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-seedling text-2xl text-emerald-300"></i>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Crop Variety</label>
-                            <input type="text" id="f_crop" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Tomato (Hybrid)">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantity (Kg)</label>
-                            <input type="number" id="f_qty" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 2500">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Direct Price (₹/kg)</label>
-                            <input type="number" step="0.5" id="f_price" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="18.0">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Local Mandi Rate</label>
-                            <input type="number" step="0.5" id="f_mandi" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="14.0">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Retail Shelf Price</label>
-                            <input type="number" step="0.5" id="f_retail" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="32.0">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pickup Latitude</label>
-                            <input type="number" step="0.0001" id="f_lat" value="20.0100" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pickup Longitude</label>
-                            <input type="number" step="0.0001" id="f_lon" value="73.7900" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                        </div>
-                    </div>
-
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Harvest / Ready Date</label>
-                        <input type="date" id="f_date" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <h1 class="text-xl font-extrabold tracking-tight">KisanSetu Portal</h1>
+                        <p class="text-xs text-emerald-200">Dept. of Consumer Affairs (DoCA) • Problem ID 26033</p>
                     </div>
+                </div>
 
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md transition">
-                        Publish Batch to Direct Portal
-                    </button>
-                </form>
+                <nav class="flex flex-wrap gap-1.5 items-center">
+                    <button onclick="switchTab(this, 'marketplace')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition bg-emerald-900 text-white shadow-sm">Buyer Market</button>
+                    <button onclick="switchTab(this, 'farmer')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition text-emerald-100 hover:bg-emerald-700/60">Farmer Desk</button>
+                    <button onclick="switchTab(this, 'logistics')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition text-emerald-100 hover:bg-emerald-700/60">AI Route Engine</button>
+                    <button onclick="switchTab(this, 'analytics')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition text-emerald-100 hover:bg-emerald-700/60">Demand Forecast</button>
+                </nav>
+
+                <div id="auth-container" class="flex items-center space-x-2"></div>
+            </div>
+        </header>
+
+        <!-- Sub-banner: KPI Highlights -->
+        <section class="bg-emerald-900 text-white border-b border-emerald-700/60 py-3 shadow-inner">
+            <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center divide-x divide-emerald-800/60">
+                <div>
+                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Farmer Realization</p>
+                    <p class="text-base sm:text-lg font-extrabold text-emerald-100">+20% to +30% Above Mandi</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Consumer Savings</p>
+                    <p class="text-base sm:text-lg font-extrabold text-emerald-100">15% to 25% Off Retail</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Intermediary Markup</p>
+                    <p class="text-base sm:text-lg font-extrabold text-amber-300">0% Extraction Rate</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Logistics Efficiency</p>
+                    <p class="text-base sm:text-lg font-extrabold text-emerald-100">First-Mile CVRP Clustering</p>
+                </div>
             </div>
         </section>
 
-        <!-- TAB 3: ROUTE ENGINE -->
-        <section id="logistics-tab" class="tab-content hidden">
-            <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">AI Route Engine & Aggregation Optimizer</h2>
-                    <p class="text-sm text-slate-500">Heuristic Vehicle Routing Problem (VRP) clustering farm pickup waypoints.</p>
-                </div>
-                <button onclick="runRouteOptimization()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm flex items-center shadow">
-                    <i class="fa-solid fa-route mr-2"></i> Run Route Optimization
-                </button>
-            </div>
+        <!-- Main Content Viewport -->
+        <main class="max-w-7xl mx-auto px-4 py-6">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                    <div id="map" style="height: 480px; width: 100%; border-radius: 0.5rem;"></div>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <!-- TAB 1: BUYER MARKETPLACE -->
+            <section id="marketplace-tab" class="tab-content">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h3 class="font-bold text-base border-b pb-2 mb-3 text-slate-800">Route Execution Plan</h3>
-                        <div id="route-stats" class="space-y-3 text-sm">
-                            <p class="text-slate-500">Click "Run Route Optimization" to cluster active farm pickups.</p>
+                        <h2 class="text-2xl font-bold text-slate-800">Direct Farm Catalog</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Buy fresh farm harvests directly with transparent fair price corridors.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-lg px-3 py-1.5 flex items-center shadow-sm">
+                        <i class="fa-solid fa-filter text-slate-400 mr-2 text-xs"></i>
+                        <select id="filter-crop" onchange="renderMarketplace()" class="text-xs sm:text-sm border-none outline-none bg-transparent font-medium text-slate-700">
+                            <option value="All">All Produce</option>
+                            <option value="Tomato">Tomato</option>
+                            <option value="Onion">Onion</option>
+                            <option value="Capsicum">Capsicum</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </section>
+
+            <!-- TAB 2: FARMER DESK -->
+            <section id="farmer-tab" class="tab-content hidden">
+                <div id="login-prompt-banner" class="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center space-x-3 text-amber-900">
+                        <i class="fa-solid fa-triangle-exclamation text-xl text-amber-600"></i>
+                        <div>
+                            <p class="font-bold text-sm">Farmer Authentication Required to Publish Harvests</p>
+                            <p class="text-xs text-amber-700">Please log in using your Kisan ID / Mobile number to register inventory.</p>
                         </div>
                     </div>
-                    <div class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-xs text-indigo-900">
-                        <i class="fa-solid fa-circle-info mr-1"></i> Reduces spoilage from ~25% down to under 8% via clustered first-mile routing.
+                    <button onclick="openLoginModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">
+                        <i class="fa-solid fa-right-to-bracket mr-1.5"></i>Login as Farmer
+                    </button>
+                </div>
+
+                <div id="logged-in-profile" class="hidden mb-6 p-5 bg-white border border-emerald-200 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-800 text-xl font-bold">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 id="profile-name" class="font-bold text-slate-800 text-base"></h3>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">e-KYC Verified</span>
+                            </div>
+                            <p id="profile-fpo" class="text-xs text-slate-500"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="openFarmerMyListingsModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-boxes-stacked mr-1.5"></i>My Listings (<span id="my-listings-count">0</span>)
+                        </button>
+                        <button onclick="logoutFarmer()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-power-off mr-1"></i>Sign Out
+                        </button>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- TAB 4: DEMAND FORECAST -->
-        <section id="analytics-tab" class="tab-content hidden">
-            <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200">
+                    <div class="mb-6 border-b pb-4">
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-tractor mr-3 text-emerald-600"></i>List Harvest Batch
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Publish produce lots directly to bulk buyers and consumer cooperative clusters.</p>
+                    </div>
+
+                    <form id="farmerForm" onsubmit="submitListing(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Farmer / Lead Name</label>
+                                <input type="text" id="f_name" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Ramesh Patil">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">FPO Name</label>
+                                <input type="text" id="f_fpo" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Nashik Agro FPO">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Crop Variety</label>
+                                <input type="text" id="f_crop" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Tomato (Hybrid)">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantity (Kg)</label>
+                                <input type="number" id="f_qty" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 2500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Direct Price (₹/kg)</label>
+                                <input type="number" step="0.5" id="f_price" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="18.0">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Local Mandi Benchmark</label>
+                                <input type="number" step="0.5" id="f_mandi" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="14.0">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Retail Shelf Benchmark</label>
+                                <input type="number" step="0.5" id="f_retail" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="32.0">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pickup Latitude</label>
+                                <input type="number" step="0.0001" id="f_lat" value="20.0100" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pickup Longitude</label>
+                                <input type="number" step="0.0001" id="f_lon" value="73.7900" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Harvest / Dispatch Date</label>
+                            <input type="date" id="f_date" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow transition flex items-center justify-center">
+                            <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Publish Batch to National Marketplace
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 3: ROUTE ENGINE -->
+            <section id="logistics-tab" class="tab-content hidden">
+                <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">AI Route Engine & Aggregation Optimizer</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Heuristic Capacitated Vehicle Routing Problem (CVRP) clustering farm pickup nodes.</p>
+                    </div>
+                    <button onclick="runRouteOptimization()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm flex items-center shadow transition">
+                        <i class="fa-solid fa-route mr-2"></i> Run Route Optimization
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <div id="map" style="height: 480px; width: 100%; border-radius: 0.5rem; z-index: 1;"></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-base border-b pb-2 mb-3 text-slate-800 flex items-center">
+                                <i class="fa-solid fa-truck-ramp-box mr-2 text-indigo-600"></i>Route Execution Plan
+                            </h3>
+                            <div id="route-stats" class="space-y-3 text-sm">
+                                <p class="text-slate-500 text-xs">Click "Run Route Optimization" to cluster active farm pickups and generate waypoints.</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-xs text-indigo-900">
+                            <i class="fa-solid fa-shield-halved mr-1 text-indigo-600"></i>
+                            <strong>Spoilage Reduction:</strong> Cuts transit delays by ~35% and spoilage down to under 8% via clustered first-mile routing.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: DEMAND FORECAST -->
+            <section id="analytics-tab" class="tab-content hidden">
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">AI Demand & Corridor Price Engine</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">7-Day arrival-based predictive elasticity and fair floor/ceiling corridor projections.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="loadForecast('Tomato')" class="crop-btn px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded transition">Tomato</button>
+                        <button onclick="loadForecast('Onion')" class="crop-btn px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-semibold rounded transition">Onion</button>
+                        <button onclick="loadForecast('Capsicum')" class="crop-btn px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-semibold rounded transition">Capsicum</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-800 mb-3 text-sm flex items-center">
+                            <i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i> 7-Day Projected Demand (Kg)
+                        </h3>
+                        <div class="relative h-64"><canvas id="demandChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-800 mb-3 text-sm flex items-center">
+                            <i class="fa-solid fa-tags text-indigo-600 mr-2"></i> Fair Corridor Price (₹/kg)
+                        </h3>
+                        <div class="relative h-64"><canvas id="priceChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div id="ai-recommendation-box" class="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-xs sm:text-sm text-emerald-900 flex items-center">
+                    <i class="fa-solid fa-wand-magic-sparkles text-emerald-600 text-xl mr-3 flex-shrink-0"></i>
+                    <span id="ai-rec-text">Loading forecast...</span>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>© 2026 KisanSetu Portal • Department of Consumer Affairs (DoCA) Initiative</p>
+            <p class="text-slate-400">Direct Farm Gate Sales • Fair Price Discovery • First-Mile CVRP</p>
+        </div>
+    </footer>
+
+    <!-- ============================================== -->
+    <!-- FLOATING AI CHATBOX COMPONENT                 -->
+    <!-- ============================================== -->
+    <div id="ai-chat-launcher" onclick="toggleChat()" class="fixed bottom-6 right-6 z-50 cursor-pointer bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all transform hover:scale-105 border-2 border-emerald-500">
+        <i class="fa-solid fa-robot text-lg text-emerald-200"></i>
+        <span class="font-bold text-xs tracking-wide">KisanSetu AI Advisor</span>
+    </div>
+
+    <div id="ai-chat-window" class="fixed bottom-20 right-6 w-96 max-w-[92vw] h-[540px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-slate-200 transition-all" style="display: none;">
+        <!-- Chat Header -->
+        <div class="bg-emerald-800 text-white p-3.5 flex justify-between items-center shadow">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800">AI Demand & Corridor Price Engine</h2>
-                    <p class="text-sm text-slate-500">7-Day arrival-based predictive elasticity and fair floor/ceiling corridor projections.</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="loadForecast('Tomato')" class="crop-btn px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded transition">Tomato</button>
-                    <button onclick="loadForecast('Onion')" class="crop-btn px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-semibold rounded transition">Onion</button>
-                    <button onclick="loadForecast('Capsicum')" class="crop-btn px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-semibold rounded transition">Capsicum</button>
+                    <h4 class="font-bold text-sm leading-tight">KisanSetu Advisor</h4>
+                    <p class="text-[10px] text-emerald-200 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        AI Economics & Logistics Assistant
+                    </p>
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-800 mb-3 text-sm flex items-center">
-                        <i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i> 7-Day Projected Demand (Kg)
-                    </h3>
-                    <div class="relative h-64"><canvas id="demandChart"></canvas></div>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-800 mb-3 text-sm flex items-center">
-                        <i class="fa-solid fa-tags text-indigo-600 mr-2"></i> Fair Corridor Price (₹/kg)
-                    </h3>
-                    <div class="relative h-64"><canvas id="priceChart"></canvas></div>
-                </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleChat()" class="text-emerald-200 hover:text-white text-base px-1.5 transition">&times;</button>
             </div>
+        </div>
 
-            <div id="ai-recommendation-box" class="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-900 flex items-center">
-                <i class="fa-solid fa-wand-magic-sparkles text-emerald-600 text-xl mr-3"></i>
-                <span id="ai-rec-text">Loading forecast...</span>
+        <!-- Quick Prompt Chips -->
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex gap-1.5 overflow-x-auto text-[11px] whitespace-nowrap">
+            <button onclick="sendQuickPrompt('How do price corridors work?')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">💰 Price Corridors?</button>
+            <button onclick="sendQuickPrompt('Explain CVRP route aggregation')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">🚛 CVRP Clustering?</button>
+            <button onclick="sendQuickPrompt('What produce is in stock right now?')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">📦 Current Stock?</button>
+            <button onclick="sendQuickPrompt('How can a farmer list harvest with e-KYC?')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">🌾 Farmer e-KYC?</button>
+        </div>
+
+        <!-- Chat Conversation Area -->
+        <div id="chat-messages" class="flex-1 p-3.5 overflow-y-auto space-y-2.5 bg-slate-50 text-xs leading-relaxed">
+            <div class="chat-bubble bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl max-w-[90%] shadow-sm">
+                <p class="font-bold mb-1">Namaste! I am your KisanSetu Advisor 🌾</p>
+                <p>I can help you understand <b>mandi price corridors</b>, <b>first-mile route optimization</b>, produce quality storage, or how to buy and list crops directly. What would you like to explore?</p>
             </div>
-        </section>
+        </div>
 
-    </main>
+        <!-- Chat Input Bar -->
+        <div class="p-2.5 border-t border-slate-200 bg-white flex items-center gap-1.5">
+            <button id="voice-btn" onclick="startVoiceRecognition()" title="Speak in English/Hindi" class="text-slate-400 hover:text-emerald-700 p-2 rounded-lg transition text-sm">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <input type="text" id="chat-input" placeholder="Ask in English or Hindi..." class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none" onkeydown="if(event.key === 'Enter') handleSend();" />
+            <button onclick="handleSend()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition shadow-sm">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODALS (FARMER LOGIN, MY LISTINGS, BUY ESCROW) -->
+    <!-- ============================================== -->
 
     <!-- FARMER LOGIN MODAL -->
     <div id="farmerLoginModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
@@ -357,8 +445,11 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIC -->
+    <!-- ============================================== -->
+    <!-- APPLICATION JAVASCRIPT LOGIC                   -->
+    <!-- ============================================== -->
     <script>
+        // Primary Data Store
         let listings = JSON.parse(localStorage.getItem('kisan_listings')) || [
             {
                 id: 1,
@@ -412,6 +503,7 @@
             localStorage.setItem('kisan_listings', JSON.stringify(listings));
         }
 
+        // Authentication & Header Rendering
         function renderAuthBar() {
             const authContainer = document.getElementById('auth-container');
             const loginPromptBanner = document.getElementById('login-prompt-banner');
@@ -419,8 +511,8 @@
 
             if (currentFarmer) {
                 authContainer.innerHTML = `
-                    <div class="flex items-center space-x-2 bg-emerald-700/80 px-3 py-1.5 rounded-lg border border-emerald-600">
-                        <i class="fa-solid fa-circle-user text-emerald-300 text-lg"></i>
+                    <div class="flex items-center space-x-2 bg-emerald-700/90 px-3 py-1.5 rounded-lg border border-emerald-600">
+                        <i class="fa-solid fa-circle-user text-emerald-300 text-sm"></i>
                         <span class="text-xs font-semibold text-white">${currentFarmer.name}</span>
                         <button onclick="logoutFarmer()" title="Logout" class="text-emerald-300 hover:text-white ml-2 text-xs">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -485,7 +577,7 @@
 
             closeLoginModal();
             renderAuthBar();
-            alert(`Welcome back, ${name}! Your farmer desk is active.`);
+            alert(`Welcome back, ${name}! Your e-KYC verified desk is ready.`);
         }
 
         function logoutFarmer() {
@@ -504,7 +596,7 @@
             const myListings = listings.filter(l => l.phone === currentFarmer.phone || l.farmer_name === currentFarmer.name);
 
             if (myListings.length === 0) {
-                container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">You have not published any harvest batches yet.</div>`;
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">You have not published any harvest batches yet.</div>`;
             } else {
                 myListings.forEach(item => {
                     const row = document.createElement('div');
@@ -519,7 +611,7 @@
                             <p class="text-[11px] text-slate-400 mt-0.5">Harvest Date: ${item.harvest_date}</p>
                         </div>
                         <div>
-                            <button onclick="removeListing(${item.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 bg-red-50 hover:bg-red-100 rounded transition">
+                            <button onclick="removeListing(${item.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2.5 py-1 bg-red-50 hover:bg-red-100 rounded transition">
                                 <i class="fa-solid fa-trash mr-1"></i>Delist
                             </button>
                         </div>
@@ -545,10 +637,11 @@
             }
         }
 
+        // Navigation Tab Switcher
         function switchTab(btnElement, tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('bg-emerald-700', 'text-white');
+                el.classList.remove('bg-emerald-900', 'text-white', 'shadow-sm');
                 el.classList.add('text-emerald-100');
             });
             
@@ -556,7 +649,7 @@
             if (target) target.classList.remove('hidden');
 
             if (btnElement) {
-                btnElement.classList.add('bg-emerald-700', 'text-white');
+                btnElement.classList.add('bg-emerald-900', 'text-white', 'shadow-sm');
                 btnElement.classList.remove('text-emerald-100');
             }
 
@@ -571,6 +664,7 @@
             }
         }
 
+        // Marketplace Render Logic
         function renderMarketplace() {
             const filter = document.getElementById('filter-crop').value;
             const container = document.getElementById('listings-grid');
@@ -581,7 +675,7 @@
                 : listings.filter(i => i.crop.toLowerCase().includes(filter.toLowerCase()));
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-3 text-center py-10 text-slate-400">No active produce listings found matching "${filter}".</div>`;
+                container.innerHTML = `<div class="col-span-3 text-center py-10 text-slate-400 text-sm">No active produce listings found matching "${filter}".</div>`;
                 return;
             }
 
@@ -593,21 +687,21 @@
                 card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col justify-between";
                 card.innerHTML = `
                     <div>
-                        <div class="bg-slate-100 p-4 border-b flex justify-between items-center">
-                            <span class="text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-1 rounded">FPO Batch</span>
+                        <div class="bg-slate-100/70 p-4 border-b flex justify-between items-center">
+                            <span class="text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">FPO Cluster Batch</span>
                             <span class="text-xs text-slate-500"><i class="fa-solid fa-calendar mr-1"></i>${item.harvest_date}</span>
                         </div>
                         <div class="p-5">
                             <h3 class="text-lg font-bold text-slate-900">${item.crop}</h3>
                             <p class="text-xs text-slate-500 font-medium mb-3">${item.fpo} • ${item.farmer_name}</p>
                             
-                            <div class="bg-slate-50 p-3 rounded-lg mb-4 space-y-1 text-xs">
+                            <div class="bg-slate-50 p-3 rounded-lg mb-4 space-y-1.5 text-xs">
                                 <div class="flex justify-between">
                                     <span class="text-slate-500">Available Stock:</span>
                                     <span class="font-bold text-slate-800">${item.quantity_kg.toLocaleString()} Kg</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-slate-500">Local Mandi Rate:</span>
+                                    <span class="text-slate-500">Local Mandi Benchmark:</span>
                                     <span class="line-through text-slate-400">₹${item.mandi_benchmark}/kg</span>
                                 </div>
                                 <div class="flex justify-between">
@@ -629,8 +723,8 @@
                         </div>
                     </div>
                     <div class="p-5 pt-0">
-                        <button onclick="openBuyModal(${item.id}, '${item.crop}', ${item.quantity_kg}, ${item.base_price_kg})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
-                            Direct Purchase
+                        <button onclick="openBuyModal(${item.id}, '${item.crop}', ${item.quantity_kg}, ${item.base_price_kg})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs sm:text-sm transition flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-cart-shopping mr-2"></i> Direct Purchase (Escrow)
                         </button>
                     </div>`;
                 container.appendChild(card);
@@ -663,7 +757,7 @@
 
             listings.push(newEntry);
             saveListings();
-            alert("Harvest batch successfully published to National Marketplace!");
+            alert("Harvest batch successfully published to National Direct Portal!");
             document.getElementById('farmerForm').reset();
             document.getElementById('f_lat').value = "20.0100";
             document.getElementById('f_lon').value = "73.7900";
@@ -699,13 +793,14 @@
                 }
                 target.quantity_kg -= qty;
                 saveListings();
-                alert("Direct purchase confirmed! Order assigned to first-mile logistics consolidation.");
+                alert("Direct purchase confirmed! Funds placed into smart escrow until dispatch sign-off.");
                 closeModal();
                 renderMarketplace();
                 renderAuthBar();
             }
         }
 
+        // Map and CVRP Optimizer
         function initMap() {
             if (map) return;
             map = L.map('map').setView([19.9975, 73.7898], 9);
@@ -778,23 +873,24 @@
             const statsContainer = document.getElementById('route-stats');
             let stepsHtml = `
                 <div class="border-b pb-2">
-                    <p class="text-xs text-slate-400 font-bold uppercase">Estimated Route Distance</p>
+                    <p class="text-xs text-slate-400 font-bold uppercase">Estimated Consolidated Circuit</p>
                     <p class="text-xl font-black text-slate-800">${totalDistanceKm.toFixed(2)} Km</p>
                 </div>
                 <div class="space-y-2 mt-3 max-h-56 overflow-y-auto">
-                    <p class="text-xs font-bold text-slate-600 uppercase">Optimized Aggregation Order:</p>`;
+                    <p class="text-xs font-bold text-slate-600 uppercase">Optimized First-Mile Cluster Order:</p>`;
             
             orderedRoute.forEach((st, idx) => {
                 stepsHtml += `
-                <div class="flex items-center text-xs text-slate-700 py-1">
+                <div class="flex items-center text-xs text-slate-700 py-1 border-b border-slate-100 last:border-none">
                     <span class="w-5 h-5 flex-shrink-0 flex items-center justify-center bg-indigo-100 text-indigo-800 rounded-full font-bold mr-2 text-[10px]">${idx + 1}</span>
-                    <span class="truncate">${st.name}</span>
+                    <span class="truncate font-medium">${st.name}</span>
                 </div>`;
             });
             stepsHtml += `</div>`;
             statsContainer.innerHTML = stepsHtml;
         }
 
+        // Analytics & Forecasting
         function loadForecast(crop) {
             document.querySelectorAll('.crop-btn').forEach(btn => {
                 if (btn.innerText.includes(crop)) {
@@ -830,8 +926,8 @@
                 prices.push(projectedPrice);
             }
 
-            document.getElementById('ai-rec-text').innerText = 
-                `Optimal harvest release window for ${crop}: Days 5 to 7 align with peak retail weekend demand surges.`;
+            document.getElementById('ai-rec-text').innerHTML = 
+                `<strong>Market Intelligence:</strong> Optimal harvest release window for <strong>${crop}</strong> is Days 5 to 7 to capture weekend urban demand spikes at peak corridor prices.`;
 
             if (demandChartInstance) demandChartInstance.destroy();
             const ctxDemand = document.getElementById('demandChart').getContext('2d');
@@ -867,6 +963,135 @@
             });
         }
 
+        // ==============================================
+        // AI CHATBOT ENGINE (GROUNDED DOMAIN ASSISTANT)
+        // ==============================================
+        function toggleChat() {
+            const win = document.getElementById('ai-chat-window');
+            win.style.display = (win.style.display === 'none' || win.style.display === '') ? 'flex' : 'none';
+        }
+
+        function sendQuickPrompt(text) {
+            document.getElementById('chat-input').value = text;
+            handleSend();
+        }
+
+        function appendMessage(sender, text) {
+            const msgContainer = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `chat-bubble p-3 rounded-xl max-w-[85%] text-xs leading-relaxed ${
+                sender === 'user' 
+                    ? 'bg-emerald-700 text-white self-end ml-auto rounded-br-none shadow-sm' 
+                    : 'bg-white border border-slate-200 text-slate-800 self-start shadow-sm rounded-bl-none'
+            }`;
+            div.innerHTML = text;
+            msgContainer.appendChild(div);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+
+        // Domain Knowledge Response Engine
+        function generateLocalAIResponse(query) {
+            const q = query.toLowerCase();
+
+            if (q.includes('corridor') || q.includes('price') || q.includes('mandi') || q.includes('rate')) {
+                return `<b>How KisanSetu Price Corridors Work:</b><br>
+                Instead of middleman commission (traditionally 15-25%), KisanSetu establishes an algorithmic price corridor:
+                <ul class="list-disc ml-4 mt-1 space-y-1">
+                    <li><b>Floor (Farmer Price):</b> Guaranteed +20% to +30% above prevailing APMC Mandi rates.</li>
+                    <li><b>Ceiling (Consumer Price):</b> 15% to 25% lower than traditional retail supermarket prices.</li>
+                    <li>Middleman extraction is reduced to <b>0%</b> via escrow contract settlement.</li>
+                </ul>`;
+            }
+
+            if (q.includes('cvrp') || q.includes('route') || q.includes('logistics') || q.includes('truck') || q.includes('spoilage')) {
+                return `<b>First-Mile CVRP Clustering:</b><br>
+                Smallholder farmers often lose up to 25% of fresh produce due to fragmented single-vehicle trips. Our <i>Capacitated Vehicle Routing Problem (CVRP)</i> engine clusters neighbouring FPO lots along a shared route, bringing collection costs down by ~35% and post-harvest spoilage below 8%.`;
+            }
+
+            if (q.includes('stock') || q.includes('available') || q.includes('produce') || q.includes('inventory')) {
+                const stockSummary = listings.map(l => `• <b>${l.crop}</b>: ${l.quantity_kg.toLocaleString()} Kg @ ₹${l.base_price_kg}/kg (${l.fpo})`).join('<br>');
+                return `<b>Live Verified Portal Inventory:</b><br>${stockSummary}<br><br><i>Switch to the "Buyer Market" tab to order with escrow.</i>`;
+            }
+
+            if (q.includes('kyc') || q.includes('register') || q.includes('farmer') || q.includes('login')) {
+                return `<b>Farmer Registration & e-KYC:</b><br>
+                1. Click <b>"Farmer Desk"</b> or the <b>"Farmer Login"</b> button.<br>
+                2. Enter your 10-digit Kisan ID / Mobile number and OTP (Demo: <i>1234</i>).<br>
+                3. Once e-KYC verified, list harvest batches specifying direct floor rate, mandi benchmark, and GPS coordinates for automated pickup.`;
+            }
+
+            if (q.includes('tomato') || q.includes('storage') || q.includes('onion') || q.includes('capsicum')) {
+                return `<b>Agronomic Handling & Storage Standards:</b><br>
+                • <b>Tomato:</b> Store at 12-15°C with 85-90% RH. Avoid cold injury below 10°C.<br>
+                • <b>Red Onion:</b> Ensure well-ventilated dry curing; avoid moisture condensation to prevent black mold.<br>
+                • <b>Capsicum:</b> Rapid precooling at 7-10°C ensures turgidity and prevents weight loss.`;
+            }
+
+            return `I understand you are asking about: <i>"${query}"</i>.<br><br>
+            On KisanSetu, you can directly connect farm gate supply to urban clusters, run CVRP first-mile route clustering, and inspect predictive 7-day fair price corridors. Try clicking one of the quick suggestions above!`;
+        }
+
+        async function handleSend() {
+            const input = document.getElementById('chat-input');
+            const userText = input.value.trim();
+            if (!userText) return;
+
+            appendMessage('user', userText);
+            input.value = '';
+
+            // Render thinking indicator
+            const msgContainer = document.getElementById('chat-messages');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'chat-bubble bg-slate-200 text-slate-600 p-2.5 rounded-xl max-w-[60%] text-xs italic self-start';
+            thinkingDiv.id = 'thinking-indicator';
+            thinkingDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing query...`;
+            msgContainer.appendChild(thinkingDiv);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+
+            setTimeout(() => {
+                const indicator = document.getElementById('thinking-indicator');
+                if (indicator) indicator.remove();
+                const reply = generateLocalAIResponse(userText);
+                appendMessage('bot', reply);
+            }, 550);
+        }
+
+        // Voice Input (Speech-to-Text)
+        function startVoiceRecognition() {
+            const voiceBtn = document.getElementById('voice-btn');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                alert("Speech recognition is not supported by your current browser. Please use Chrome or Edge.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                voiceBtn.classList.add('text-red-500', 'animate-pulse');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chat-input').value = transcript;
+                handleSend();
+            };
+
+            recognition.onerror = () => {
+                voiceBtn.classList.remove('text-red-500', 'animate-pulse');
+            };
+
+            recognition.onend = () => {
+                voiceBtn.classList.remove('text-red-500', 'animate-pulse');
+            };
+
+            recognition.start();
+        }
+
+        // Initialization
         window.addEventListener('DOMContentLoaded', () => {
             renderAuthBar();
             renderMarketplace();
