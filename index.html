@@ -1,1103 +1,678 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KisanSetu | Direct Farm-to-Fork Marketplace & Farmer Portal</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet Map CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <style>
-        /* Custom scrollbar for chat and modals */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .chat-bubble { animation: fadeIn 0.2s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KisanSetu Portal | Direct Farm-Gate & Logistics Engine</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #15803d;
+      --primary-dark: #166534;
+      --primary-light: #dcfce7;
+      --accent: #f59e0b;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.5; }
+
+    /* Header */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .brand-text h1 { font-size: 1.25rem; font-weight: 700; color: var(--primary-dark); }
+    .brand-text p { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Navigation */
+    nav { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 2px; }
+    .nav-btn {
+      background: none;
+      border: 1px solid transparent;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-btn:hover { background: var(--border); color: var(--text); }
+    .nav-btn.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: rgba(21, 128, 61, 0.2);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1280px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      min-height: 75vh;
+    }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* UI Components */
+    .section-title {
+      margin-bottom: 1.25rem;
+    }
+    .section-title h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .section-title p { font-size: 0.9rem; color: var(--text-muted); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; }
+    .stat-card .value { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); margin-top: 0.35rem; }
+    .stat-card .sub { font-size: 0.75rem; color: #16a34a; margin-top: 0.2rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* Tables & Lists */
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+    th, td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); }
+    th { background: #f1f5f9; color: var(--text-muted); font-weight: 600; }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+    }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+
+    /* Form Styles */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+    .form-control {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--primary); }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #64748b; }
+    .btn-secondary:hover { background: #475569; }
+
+    /* AI Chatbot Float */
+    .chat-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+    }
+    .chat-toggle {
+      background: var(--primary-dark);
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 30px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .chat-window {
+      display: none;
+      width: 340px;
+      height: 420px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+    .chat-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 0.85rem;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .chat-body {
+      flex: 1;
+      padding: 0.85rem;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .chat-msg { padding: 0.55rem 0.75rem; border-radius: 8px; max-width: 85%; }
+    .chat-msg.bot { background: #f1f5f9; align-self: flex-start; }
+    .chat-msg.user { background: var(--primary-light); color: var(--primary-dark); align-self: flex-end; }
+    .chat-input { display: flex; border-top: 1px solid var(--border); }
+    .chat-input input { flex: 1; border: none; padding: 0.65rem; outline: none; }
+    .chat-input button { border: none; background: var(--primary); color: #fff; padding: 0 0.9rem; cursor: pointer; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      background: #fff;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 3rem;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col justify-between">
+<body>
 
-    <div>
-        <!-- Top Navigation Header -->
-        <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center shadow-inner">
-                        <i class="fa-solid fa-seedling text-2xl text-emerald-300"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-extrabold tracking-tight">KisanSetu Portal</h1>
-                        <p class="text-xs text-emerald-200">Dept. of Consumer Affairs (DoCA) • Problem ID 26033</p>
-                    </div>
-                </div>
+  <!-- Top Header & Navigation -->
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+        <div class="brand-text">
+          <h1>KisanSetu Portal</h1>
+          <p>Dept. of Consumer Affairs (DoCA) • Problem ID 26033</p>
+        </div>
+      </div>
 
-                <nav class="flex flex-wrap gap-1.5 items-center">
-                    <button onclick="switchTab(this, 'marketplace')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition bg-emerald-900 text-white shadow-sm">Buyer Market</button>
-                    <button onclick="switchTab(this, 'farmer')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition text-emerald-100 hover:bg-emerald-700/60">Farmer Desk</button>
-                    <button onclick="switchTab(this, 'logistics')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition text-emerald-100 hover:bg-emerald-700/60">AI Route Engine</button>
-                    <button onclick="switchTab(this, 'analytics')" class="tab-btn px-3.5 py-2 rounded-lg font-semibold text-xs transition text-emerald-100 hover:bg-emerald-700/60">Demand Forecast</button>
-                </nav>
-
-                <div id="auth-container" class="flex items-center space-x-2"></div>
-            </div>
-        </header>
-
-        <!-- Sub-banner: KPI Highlights -->
-        <section class="bg-emerald-900 text-white border-b border-emerald-700/60 py-3 shadow-inner">
-            <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center divide-x divide-emerald-800/60">
-                <div>
-                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Farmer Realization</p>
-                    <p class="text-base sm:text-lg font-extrabold text-emerald-100">+20% to +30% Above Mandi</p>
-                </div>
-                <div>
-                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Consumer Savings</p>
-                    <p class="text-base sm:text-lg font-extrabold text-emerald-100">15% to 25% Off Retail</p>
-                </div>
-                <div>
-                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Intermediary Markup</p>
-                    <p class="text-base sm:text-lg font-extrabold text-amber-300">0% Extraction Rate</p>
-                </div>
-                <div>
-                    <p class="text-[11px] text-emerald-300 uppercase font-bold tracking-wider">Logistics Efficiency</p>
-                    <p class="text-base sm:text-lg font-extrabold text-emerald-100">First-Mile CVRP Clustering</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Main Content Viewport -->
-        <main class="max-w-7xl mx-auto px-4 py-6">
-
-            <!-- TAB 1: BUYER MARKETPLACE -->
-            <section id="marketplace-tab" class="tab-content">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Direct Farm Catalog</h2>
-                        <p class="text-xs sm:text-sm text-slate-500">Buy fresh farm harvests directly with transparent fair price corridors.</p>
-                    </div>
-                    <div class="bg-white border border-slate-200 rounded-lg px-3 py-1.5 flex items-center shadow-sm">
-                        <i class="fa-solid fa-filter text-slate-400 mr-2 text-xs"></i>
-                        <select id="filter-crop" onchange="renderMarketplace()" class="text-xs sm:text-sm border-none outline-none bg-transparent font-medium text-slate-700">
-                            <option value="All">All Produce</option>
-                            <option value="Tomato">Tomato</option>
-                            <option value="Onion">Onion</option>
-                            <option value="Capsicum">Capsicum</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-            </section>
-
-            <!-- TAB 2: FARMER DESK -->
-            <section id="farmer-tab" class="tab-content hidden">
-                <div id="login-prompt-banner" class="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div class="flex items-center space-x-3 text-amber-900">
-                        <i class="fa-solid fa-triangle-exclamation text-xl text-amber-600"></i>
-                        <div>
-                            <p class="font-bold text-sm">Farmer Authentication Required to Publish Harvests</p>
-                            <p class="text-xs text-amber-700">Please log in using your Kisan ID / Mobile number to register inventory.</p>
-                        </div>
-                    </div>
-                    <button onclick="openLoginModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">
-                        <i class="fa-solid fa-right-to-bracket mr-1.5"></i>Login as Farmer
-                    </button>
-                </div>
-
-                <div id="logged-in-profile" class="hidden mb-6 p-5 bg-white border border-emerald-200 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-800 text-xl font-bold">
-                            <i class="fa-solid fa-user-check"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h3 id="profile-name" class="font-bold text-slate-800 text-base"></h3>
-                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">e-KYC Verified</span>
-                            </div>
-                            <p id="profile-fpo" class="text-xs text-slate-500"></p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button onclick="openFarmerMyListingsModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
-                            <i class="fa-solid fa-boxes-stacked mr-1.5"></i>My Listings (<span id="my-listings-count">0</span>)
-                        </button>
-                        <button onclick="logoutFarmer()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition">
-                            <i class="fa-solid fa-power-off mr-1"></i>Sign Out
-                        </button>
-                    </div>
-                </div>
-
-                <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200">
-                    <div class="mb-6 border-b pb-4">
-                        <h2 class="text-2xl font-bold text-slate-800 flex items-center">
-                            <i class="fa-solid fa-tractor mr-3 text-emerald-600"></i>List Harvest Batch
-                        </h2>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Publish produce lots directly to bulk buyers and consumer cooperative clusters.</p>
-                    </div>
-
-                    <form id="farmerForm" onsubmit="submitListing(event)" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Farmer / Lead Name</label>
-                                <input type="text" id="f_name" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Ramesh Patil">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">FPO Name</label>
-                                <input type="text" id="f_fpo" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Nashik Agro FPO">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Crop Variety</label>
-                                <input type="text" id="f_crop" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. Tomato (Hybrid)">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantity (Kg)</label>
-                                <input type="number" id="f_qty" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 2500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Direct Price (₹/kg)</label>
-                                <input type="number" step="0.5" id="f_price" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="18.0">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Local Mandi Benchmark</label>
-                                <input type="number" step="0.5" id="f_mandi" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="14.0">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Retail Shelf Benchmark</label>
-                                <input type="number" step="0.5" id="f_retail" required min="1" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="32.0">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pickup Latitude</label>
-                                <input type="number" step="0.0001" id="f_lat" value="20.0100" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pickup Longitude</label>
-                                <input type="number" step="0.0001" id="f_lon" value="73.7900" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Harvest / Dispatch Date</label>
-                            <input type="date" id="f_date" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                        </div>
-
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow transition flex items-center justify-center">
-                            <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Publish Batch to National Marketplace
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- TAB 3: ROUTE ENGINE -->
-            <section id="logistics-tab" class="tab-content hidden">
-                <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800">AI Route Engine & Aggregation Optimizer</h2>
-                        <p class="text-xs sm:text-sm text-slate-500">Heuristic Capacitated Vehicle Routing Problem (CVRP) clustering farm pickup nodes.</p>
-                    </div>
-                    <button onclick="runRouteOptimization()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm flex items-center shadow transition">
-                        <i class="fa-solid fa-route mr-2"></i> Run Route Optimization
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                        <div id="map" style="height: 480px; width: 100%; border-radius: 0.5rem; z-index: 1;"></div>
-                    </div>
-
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-base border-b pb-2 mb-3 text-slate-800 flex items-center">
-                                <i class="fa-solid fa-truck-ramp-box mr-2 text-indigo-600"></i>Route Execution Plan
-                            </h3>
-                            <div id="route-stats" class="space-y-3 text-sm">
-                                <p class="text-slate-500 text-xs">Click "Run Route Optimization" to cluster active farm pickups and generate waypoints.</p>
-                            </div>
-                        </div>
-                        <div class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-xs text-indigo-900">
-                            <i class="fa-solid fa-shield-halved mr-1 text-indigo-600"></i>
-                            <strong>Spoilage Reduction:</strong> Cuts transit delays by ~35% and spoilage down to under 8% via clustered first-mile routing.
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: DEMAND FORECAST -->
-            <section id="analytics-tab" class="tab-content hidden">
-                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800">AI Demand & Corridor Price Engine</h2>
-                        <p class="text-xs sm:text-sm text-slate-500">7-Day arrival-based predictive elasticity and fair floor/ceiling corridor projections.</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="loadForecast('Tomato')" class="crop-btn px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded transition">Tomato</button>
-                        <button onclick="loadForecast('Onion')" class="crop-btn px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-semibold rounded transition">Onion</button>
-                        <button onclick="loadForecast('Capsicum')" class="crop-btn px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-semibold rounded transition">Capsicum</button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-800 mb-3 text-sm flex items-center">
-                            <i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i> 7-Day Projected Demand (Kg)
-                        </h3>
-                        <div class="relative h-64"><canvas id="demandChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-800 mb-3 text-sm flex items-center">
-                            <i class="fa-solid fa-tags text-indigo-600 mr-2"></i> Fair Corridor Price (₹/kg)
-                        </h3>
-                        <div class="relative h-64"><canvas id="priceChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div id="ai-recommendation-box" class="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-xs sm:text-sm text-emerald-900 flex items-center">
-                    <i class="fa-solid fa-wand-magic-sparkles text-emerald-600 text-xl mr-3 flex-shrink-0"></i>
-                    <span id="ai-rec-text">Loading forecast...</span>
-                </div>
-            </section>
-
-        </main>
+      <!-- Navigation tabs in the requested sequence -->
+      <nav id="nav-tabs">
+        <button class="nav-btn active" onclick="showTab('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="nav-btn" onclick="showTab('buyer-market')">
+          <i class="fa-solid fa-store"></i> Buyer Market
+        </button>
+        <button class="nav-btn" onclick="showTab('farmer-desk')">
+          <i class="fa-solid fa-tractor"></i> Farmer Desk
+        </button>
+        <button class="nav-btn" onclick="showTab('route-engine')">
+          <i class="fa-solid fa-route"></i> AI Route Engine
+        </button>
+        <button class="nav-btn" onclick="showTab('demand-forecast')">
+          <i class="fa-solid fa-chart-line"></i> Demand Forecast
+        </button>
+      </nav>
     </div>
+  </header>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <p>© 2026 KisanSetu Portal • Department of Consumer Affairs (DoCA) Initiative</p>
-            <p class="text-slate-400">Direct Farm Gate Sales • Fair Price Discovery • First-Mile CVRP</p>
+  <main>
+    <!-- ==================== 1. DASHBOARD ==================== -->
+    <section id="dashboard" class="tab-pane active">
+      <div class="section-title">
+        <h2>Supply Chain Overview & Impact Dashboard</h2>
+        <p>Live national aggregation metrics, fair price realization, and intermediary reduction statistics.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Farmer Realization</div>
+          <div class="value">+28.4%</div>
+          <div class="sub"><i class="fa-solid fa-arrow-trend-up"></i> Above APMC Mandi Rates</div>
         </div>
-    </footer>
+        <div class="stat-card">
+          <div class="label">Consumer Savings</div>
+          <div class="value">21.5% Off</div>
+          <div class="sub"><i class="fa-solid fa-arrow-trend-down"></i> Relative to Urban Retail</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Middleman Extraction</div>
+          <div class="value">0.0%</div>
+          <div class="sub">Direct Settlement Escrow</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Spoilage Prevention</div>
+          <div class="value">&lt; 7.8%</div>
+          <div class="sub"><i class="fa-solid fa-truck-fast"></i> First-Mile CVRP Clustering</div>
+        </div>
+      </div>
 
-    <!-- ============================================== -->
-    <!-- FLOATING AI CHATBOX COMPONENT                 -->
-    <!-- ============================================== -->
-    <div id="ai-chat-launcher" onclick="toggleChat()" class="fixed bottom-6 right-6 z-50 cursor-pointer bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all transform hover:scale-105 border-2 border-emerald-500">
-        <i class="fa-solid fa-robot text-lg text-emerald-200"></i>
-        <span class="font-bold text-xs tracking-wide">KisanSetu AI Advisor</span>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Real-Time Platform Activity</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>FPO / Cluster</th>
+                  <th>Produce</th>
+                  <th>Quantity</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dash-activity-body">
+                <tr>
+                  <td>Nashik Agri FPO</td>
+                  <td>Grade-A Tomato</td>
+                  <td>1,800 kg</td>
+                  <td><span class="badge badge-green">In Dispatch</span></td>
+                </tr>
+                <tr>
+                  <td>Sangamner Sahakari</td>
+                  <td>Red Onion</td>
+                  <td>4,200 kg</td>
+                  <td><span class="badge badge-blue">Aggregating</span></td>
+                </tr>
+                <tr>
+                  <td>Pune Rural Farmers</td>
+                  <td>Green Capsicum</td>
+                  <td>950 kg</td>
+                  <td><span class="badge badge-green">Allocated</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Regulatory Compliance & Fair Corridor</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Automatic price collars trigger whenever farm gate payouts fall below regional cultivation costs + 50% MSP target guidelines.
+          </p>
+          <div style="background: var(--bg); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--primary);">
+            <p style="font-size: 0.85rem; font-weight: 600;">System Advisory ID #26033-DOCA</p>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem;">
+              All clusters currently operating within safe corridor tolerances. Zero intermediary arbitrations pending.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. BUYER MARKET ==================== -->
+    <section id="buyer-market" class="tab-pane">
+      <div class="section-title">
+        <h2>Direct Farm Catalog</h2>
+        <p>Procure fresh harvests directly from verified farm clusters at transparent fair price corridors.</p>
+      </div>
+
+      <div class="stats-grid" id="market-listings">
+        <!-- Dynamic Cards populated via JS -->
+      </div>
+    </section>
+
+    <!-- ==================== 3. FARMER DESK ==================== -->
+    <section id="farmer-desk" class="tab-pane">
+      <div class="section-title">
+        <h2>Farmer & FPO Aggregation Desk</h2>
+        <p>Authenticate e-KYC credentials and publish fresh harvest batches directly to buyers.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Publish New Harvest Batch</h3>
+          <form id="add-harvest-form" onsubmit="handleHarvestSubmit(event)">
+            <div class="form-group">
+              <label>Crop / Produce</label>
+              <select id="f-crop" class="form-control" required>
+                <option value="Tomato">Grade-A Tomato</option>
+                <option value="Onion">Red Onion</option>
+                <option value="Capsicum">Green Capsicum</option>
+                <option value="Potato">Seed Potato</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Harvest Volume (Kg)</label>
+              <input type="number" id="f-qty" class="form-control" placeholder="e.g. 1500" required min="100">
+            </div>
+            <div class="form-group">
+              <label>Corridor Ask Price (₹/kg)</label>
+              <input type="number" id="f-price" class="form-control" placeholder="e.g. 24" required min="1">
+            </div>
+            <div class="form-group">
+              <label>Pickup Location / Cluster</label>
+              <input type="text" id="f-loc" class="form-control" placeholder="e.g. Dindori, Nashik" required>
+            </div>
+            <button type="submit" class="btn"><i class="fa-solid fa-upload"></i> List Harvest Direct</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-id-card" style="color: var(--accent);"></i> Authenticated FPO Node</h3>
+          <div style="background: var(--bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <p style="font-weight: 600; font-size: 0.9rem;">Sahyadri Farmers Cooperative Ltd.</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">UIDAI e-KYC: <span class="badge badge-green">Verified</span> • Kisan Credit Card: Linked</p>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+            All lots listed through this desk are automatically enrolled in the <strong>First-Mile CVRP Cluster Optimizer</strong> for grouped vehicle dispatch.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. AI ROUTE ENGINE ==================== -->
+    <section id="route-engine" class="tab-pane">
+      <div class="section-title">
+        <h2>AI Route Engine & Aggregation Optimizer</h2>
+        <p>Heuristic Capacitated Vehicle Routing Problem (CVRP) clustering farm pickup nodes to minimize delay and transit waste.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom: 0.8rem; font-size: 1.05rem;">Active Node Clustering</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Optimizes pickup itineraries using vehicle weight capacities (max 5,000 kg/vehicle) and maximum transit freshness windows.
+          </p>
+          <button class="btn" onclick="runRouteOptimization()"><i class="fa-solid fa-microchip"></i> Run Route Optimization</button>
+          
+          <div id="route-results" style="margin-top: 1.25rem; font-size: 0.88rem; display: none;">
+            <div style="background: var(--primary-light); color: var(--primary-dark); padding: 0.8rem; border-radius: 8px; margin-bottom: 0.8rem;">
+              <strong>Optimal Solution Converged:</strong> 2 clustered multi-stop loops generated.
+            </div>
+            <ul style="padding-left: 1.2rem; color: var(--text-muted); line-height: 1.8;">
+              <li><strong>Truck A (Capacity: 88%):</strong> Sangamner Node → Sinnar Hub → Pune Terminal</li>
+              <li><strong>Truck B (Capacity: 92%):</strong> Dindori Node → Ojhar Center → Mumbai DC</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-leaf" style="color: #16a34a;"></i> Waste Minimization Impact</h3>
+          <div style="padding: 1.5rem; background: var(--bg); border-radius: 8px; text-align: center;">
+            <div style="font-size: 2.2rem; font-weight: 700; color: var(--primary);">35.2%</div>
+            <p style="font-size: 0.85rem; font-weight: 600; margin-top: 0.2rem;">Transit Time Reduction</p>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
+              Clustered multi-farmer pickups eliminate cold-chain idle times and keep transit degradation below 8%.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 5. DEMAND FORECAST ==================== -->
+    <section id="demand-forecast" class="tab-pane">
+      <div class="section-title">
+        <h2>AI Demand & Corridor Price Engine</h2>
+        <p>7-Day arrival-based predictive elasticity, Mandi price projections, and fair corridors.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;">7-Day Demand Projection (Metric Tons)</h3>
+          <canvas id="demandChart" height="200"></canvas>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;">Fair Price Corridor (₹/kg) vs Mandi Spot</h3>
+          <canvas id="priceChart" height="200"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- KisanSetu AI Advisor Chatbot Floating Widget -->
+  <div class="chat-widget">
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <span><i class="fa-solid fa-robot"></i> KisanSetu AI Advisor</span>
+        <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChat()"></i>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="chat-msg bot">
+          Namaste! I am your KisanSetu advisor. Ask me about mandi corridors, CVRP route pickups, or crop fair pricing!
+        </div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type query..." onkeypress="if(event.key==='Enter') sendChat()">
+        <button onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
     </div>
+    <button class="chat-toggle" onclick="toggleChat()">
+      <i class="fa-solid fa-comments"></i> KisanSetu AI Advisor
+    </button>
+  </div>
 
-    <div id="ai-chat-window" class="fixed bottom-20 right-6 w-96 max-w-[92vw] h-[540px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-slate-200 transition-all" style="display: none;">
-        <!-- Chat Header -->
-        <div class="bg-emerald-800 text-white p-3.5 flex justify-between items-center shadow">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm">
-                    <i class="fa-solid fa-seedling"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-sm leading-tight">KisanSetu Advisor</h4>
-                    <p class="text-[10px] text-emerald-200 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        AI Economics & Logistics Assistant
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleChat()" class="text-emerald-200 hover:text-white text-base px-1.5 transition">&times;</button>
-            </div>
+  <footer>
+    <p>© 2026 KisanSetu Portal • Department of Consumer Affairs (DoCA) Initiative • Direct Farm Gate Sales & CVRP Clustering</p>
+  </footer>
+
+  <!-- Script Logic -->
+  <script>
+    // In-memory catalog state
+    let catalog = [
+      { id: 1, crop: "Grade-A Tomato", qty: 2400, price: 26, loc: "Nashik Cluster", rating: "4.9" },
+      { id: 2, crop: "Red Onion", qty: 5000, price: 21, loc: "Lasalgaon Hub", rating: "4.8" },
+      { id: 3, crop: "Green Capsicum", qty: 1200, price: 38, loc: "Pune Farm Belt", rating: "4.7" }
+    ];
+
+    // 1. Tab Switching Function
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetSection = document.getElementById(tabId);
+      if (targetSection) targetSection.classList.add('active');
+
+      const clickedBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => 
+        b.getAttribute('onclick')?.includes(`'${tabId}'`)
+      );
+      if (clickedBtn) clickedBtn.classList.add('active');
+
+      if (tabId === 'demand-forecast') {
+        initCharts();
+      }
+    }
+
+    // 2. Render Buyer Market
+    function renderMarket() {
+      const container = document.getElementById('market-listings');
+      container.innerHTML = catalog.map(item => `
+        <div class="stat-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <span class="badge badge-green">${item.crop}</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-star" style="color:var(--accent);"></i> ${item.rating}</span>
+          </div>
+          <div class="value" style="margin-top:0.8rem;">₹${item.price} <span style="font-size:0.85rem; font-weight:normal; color:var(--text-muted);">/ kg</span></div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;"><i class="fa-solid fa-location-dot"></i> ${item.loc}</p>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.1rem;"><i class="fa-solid fa-boxes-stacked"></i> Batch Available: ${item.qty.toLocaleString()} kg</p>
+          <button class="btn" style="width:100%; margin-top:1rem; justify-content:center; font-size:0.85rem;" onclick="alert('Procurement order locked for ${item.crop} directly with cluster escrow.')">
+            <i class="fa-solid fa-cart-shopping"></i> Procure Direct
+          </button>
         </div>
+      `).join('');
+    }
 
-        <!-- Quick Prompt Chips -->
-        <div class="bg-slate-100 p-2 border-b border-slate-200 flex gap-1.5 overflow-x-auto text-[11px] whitespace-nowrap">
-            <button onclick="sendQuickPrompt('How do price corridors work?')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">💰 Price Corridors?</button>
-            <button onclick="sendQuickPrompt('Explain CVRP route aggregation')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">🚛 CVRP Clustering?</button>
-            <button onclick="sendQuickPrompt('What produce is in stock right now?')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">📦 Current Stock?</button>
-            <button onclick="sendQuickPrompt('How can a farmer list harvest with e-KYC?')" class="bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 px-2 py-1 rounded-full border border-slate-200 transition font-medium">🌾 Farmer e-KYC?</button>
-        </div>
+    // 3. Handle Harvest Submission
+    function handleHarvestSubmit(e) {
+      e.preventDefault();
+      const crop = document.getElementById('f-crop').value;
+      const qty = parseInt(document.getElementById('f-qty').value);
+      const price = parseFloat(document.getElementById('f-price').value);
+      const loc = document.getElementById('f-loc').value;
 
-        <!-- Chat Conversation Area -->
-        <div id="chat-messages" class="flex-1 p-3.5 overflow-y-auto space-y-2.5 bg-slate-50 text-xs leading-relaxed">
-            <div class="chat-bubble bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl max-w-[90%] shadow-sm">
-                <p class="font-bold mb-1">Namaste! I am your KisanSetu Advisor 🌾</p>
-                <p>I can help you understand <b>mandi price corridors</b>, <b>first-mile route optimization</b>, produce quality storage, or how to buy and list crops directly. What would you like to explore?</p>
-            </div>
-        </div>
+      catalog.unshift({ id: Date.now(), crop, qty, price, loc, rating: "5.0" });
+      renderMarket();
 
-        <!-- Chat Input Bar -->
-        <div class="p-2.5 border-t border-slate-200 bg-white flex items-center gap-1.5">
-            <button id="voice-btn" onclick="startVoiceRecognition()" title="Speak in English/Hindi" class="text-slate-400 hover:text-emerald-700 p-2 rounded-lg transition text-sm">
-                <i class="fa-solid fa-microphone"></i>
-            </button>
-            <input type="text" id="chat-input" placeholder="Ask in English or Hindi..." class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none" onkeydown="if(event.key === 'Enter') handleSend();" />
-            <button onclick="handleSend()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition shadow-sm">
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
+      // Update Dashboard Activity
+      const tbody = document.getElementById('dash-activity-body');
+      const row = tbody.insertRow(0);
+      row.innerHTML = `<td>${loc}</td><td>${crop}</td><td>${qty.toLocaleString()} kg</td><td><span class="badge badge-blue">Aggregating</span></td>`;
 
-    <!-- ============================================== -->
-    <!-- MODALS (FARMER LOGIN, MY LISTINGS, BUY ESCROW) -->
-    <!-- ============================================== -->
+      alert(`Success! Harvest lot of ${qty} kg ${crop} published directly to Buyer Market.`);
+      e.target.reset();
+      showTab('buyer-market');
+    }
 
-    <!-- FARMER LOGIN MODAL -->
-    <div id="farmerLoginModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white max-w-md w-full p-6 sm:p-7 rounded-2xl shadow-xl relative border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center space-x-2">
-                    <div class="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700">
-                        <i class="fa-solid fa-tractor text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-800">Farmer / FPO Login</h3>
-                        <p class="text-xs text-slate-500">Access your digital farm gate sales desk</p>
-                    </div>
-                </div>
-                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
-            </div>
+    // 4. CVRP Route Optimization Trigger
+    function runRouteOptimization() {
+      const results = document.getElementById('route-results');
+      results.style.display = 'block';
+    }
 
-            <div class="mb-4 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                <p class="font-bold text-slate-700 mb-1">Quick Select Demo Farmers:</p>
-                <div class="flex flex-wrap gap-1.5">
-                    <button onclick="fillLoginCreds('9822012345', 'Ramesh Patil', 'Nashik Agro FPO')" class="px-2 py-1 bg-white border border-slate-300 rounded text-[11px] hover:bg-slate-100">Ramesh (Nashik)</button>
-                    <button onclick="fillLoginCreds('9822098765', 'Suresh Gavit', 'Dindori Farmer Producer Co.')" class="px-2 py-1 bg-white border border-slate-300 rounded text-[11px] hover:bg-slate-100">Suresh (Dindori)</button>
-                    <button onclick="fillLoginCreds('9822055555', 'Anita Shinde', 'Igatpuri Organic Farmers')" class="px-2 py-1 bg-white border border-slate-300 rounded text-[11px] hover:bg-slate-100">Anita (Igatpuri)</button>
-                </div>
-            </div>
+    // 5. Chart.js Forecast Initialization
+    let chartsInitialized = false;
+    function initCharts() {
+      if (chartsInitialized) return;
+      chartsInitialized = true;
 
-            <form onsubmit="handleFarmerLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Full Name / FPO Lead</label>
-                    <input type="text" id="login_name" required class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g. Ramesh Patil">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">FPO Organization</label>
-                    <input type="text" id="login_fpo" required class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g. Nashik Agro FPO">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Registered Mobile / Kisan ID</label>
-                    <input type="tel" id="login_phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="10-digit mobile number">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">OTP (Demo default: 1234)</label>
-                    <input type="password" id="login_otp" value="1234" required class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
+      const days = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
 
-                <div class="flex space-x-2 pt-2">
-                    <button type="button" onclick="closeLoginModal()" class="w-1/3 py-2.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-sm font-medium transition">Cancel</button>
-                    <button type="submit" class="w-2/3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition">Verify & Sign In</button>
-                </div>
-            </form>
-        </div>
-    </div>
+      new Chart(document.getElementById('demandChart'), {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Projected Demand (Tons)',
+            data: [42, 48, 55, 60, 58, 65, 72],
+            borderColor: '#15803d',
+            backgroundColor: 'rgba(21, 128, 61, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
 
-    <!-- MY LISTINGS MODAL -->
-    <div id="myListingsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-xl relative border border-slate-200 max-h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <div>
-                    <h3 class="text-lg font-bold text-slate-800">My Registered Harvest Batches</h3>
-                    <p class="text-xs text-slate-500">Track remaining inventory and direct buyer drawdowns</p>
-                </div>
-                <button onclick="closeMyListingsModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
-            </div>
-            
-            <div id="my-listings-container" class="overflow-y-auto space-y-3 flex-1 pr-1"></div>
-
-            <div class="pt-4 border-t mt-4 flex justify-end">
-                <button onclick="closeMyListingsModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">Close Window</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BUY MODAL -->
-    <div id="buyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white max-w-md w-full p-6 rounded-xl shadow-lg relative">
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Direct Order Placement</h3>
-            <p id="modal-crop-details" class="text-sm text-slate-500 mb-4"></p>
-            
-            <form onsubmit="confirmOrder(event)" class="space-y-4">
-                <input type="hidden" id="modal-listing-id">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Buyer / Cooperative Name</label>
-                    <input type="text" id="b_name" required class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g. Green Valley Residents Society">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Buyer Category</label>
-                    <select id="b_type" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="B2C Society Group Buy">B2C Housing Society (Cluster)</option>
-                        <option value="B2B HoReCa">B2B Hotel / Restaurant</option>
-                        <option value="B2B Retail Aggregator">Retail Cooperative</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Purchase Quantity (Kg)</label>
-                    <input type="number" id="b_qty" required min="1" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div class="flex space-x-2 pt-2">
-                    <button type="button" onclick="closeModal()" class="w-1/2 py-2.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-sm font-medium transition">Cancel</button>
-                    <button type="submit" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition">Confirm & Escrow</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ============================================== -->
-    <!-- APPLICATION JAVASCRIPT LOGIC                   -->
-    <!-- ============================================== -->
-    <script>
-        // Primary Data Store
-        let listings = JSON.parse(localStorage.getItem('kisan_listings')) || [
+      new Chart(document.getElementById('priceChart'), {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [
             {
-                id: 1,
-                farmer_name: "Ramesh Patil",
-                fpo: "Nashik Agro FPO",
-                phone: "9822012345",
-                crop: "Tomato (Hybrid)",
-                quantity_kg: 2500,
-                base_price_kg: 18.0,
-                mandi_benchmark: 14.0,
-                retail_benchmark: 32.0,
-                lat: 19.9975,
-                lon: 73.7898,
-                harvest_date: "2026-09-10"
+              label: 'Fair Corridor Floor (₹)',
+              data: [22, 23, 22.5, 24, 25, 24.8, 26],
+              borderColor: '#f59e0b',
+              borderDash: [5, 5],
+              fill: false
             },
             {
-                id: 2,
-                farmer_name: "Suresh Gavit",
-                fpo: "Dindori Farmer Producer Co.",
-                phone: "9822098765",
-                crop: "Red Onion",
-                quantity_kg: 5000,
-                base_price_kg: 22.0,
-                mandi_benchmark: 17.5,
-                retail_benchmark: 40.0,
-                lat: 20.2010,
-                lon: 73.8340,
-                harvest_date: "2026-09-12"
-            },
-            {
-                id: 3,
-                farmer_name: "Anita Shinde",
-                fpo: "Igatpuri Organic Farmers",
-                phone: "9822055555",
-                crop: "Green Capsicum",
-                quantity_kg: 1200,
-                base_price_kg: 42.0,
-                mandi_benchmark: 32.0,
-                retail_benchmark: 65.0,
-                lat: 19.6967,
-                lon: 73.5594,
-                harvest_date: "2026-09-08"
+              label: 'Mandi Traditional Spot (₹)',
+              data: [17, 18, 16.5, 18, 19, 18.2, 19.5],
+              borderColor: '#ef4444',
+              fill: false
             }
-        ];
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
 
-        let currentFarmer = JSON.parse(localStorage.getItem('kisan_current_farmer')) || null;
-        let map = null, polylineLayer = null, markersLayer = null;
-        let demandChartInstance = null, priceChartInstance = null;
+    // 6. AI Chatbot
+    function toggleChat() {
+      const win = document.getElementById('chatWindow');
+      win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+    }
 
-        function saveListings() {
-            localStorage.setItem('kisan_listings', JSON.stringify(listings));
+    function sendChat() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const body = document.getElementById('chatBody');
+      body.innerHTML += `<div class="chat-msg user">${text}</div>`;
+      input.value = '';
+
+      setTimeout(() => {
+        let reply = "I can assist you in calculating corridor prices, grouping batches for the CVRP vehicle run, or checking Mandi floor thresholds.";
+        if (text.toLowerCase().includes("price") || text.toLowerCase().includes("tomato")) {
+          reply = "The current fair floor price for Grade-A Tomato is calculated at ₹22.50/kg, ensuring a 28% margin over base APMC Mandi spot.";
+        } else if (text.toLowerCase().includes("route") || text.toLowerCase().includes("cvrp")) {
+          reply = "The CVRP engine clusters shipments based on capacity limits (5 MT) and geographical proximity to curb post-harvest spoilage.";
         }
-
-        // Authentication & Header Rendering
-        function renderAuthBar() {
-            const authContainer = document.getElementById('auth-container');
-            const loginPromptBanner = document.getElementById('login-prompt-banner');
-            const loggedInProfile = document.getElementById('logged-in-profile');
-
-            if (currentFarmer) {
-                authContainer.innerHTML = `
-                    <div class="flex items-center space-x-2 bg-emerald-700/90 px-3 py-1.5 rounded-lg border border-emerald-600">
-                        <i class="fa-solid fa-circle-user text-emerald-300 text-sm"></i>
-                        <span class="text-xs font-semibold text-white">${currentFarmer.name}</span>
-                        <button onclick="logoutFarmer()" title="Logout" class="text-emerald-300 hover:text-white ml-2 text-xs">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </button>
-                    </div>
-                `;
-
-                if (loginPromptBanner) loginPromptBanner.classList.add('hidden');
-                if (loggedInProfile) {
-                    loggedInProfile.classList.remove('hidden');
-                    document.getElementById('profile-name').innerText = currentFarmer.name;
-                    document.getElementById('profile-fpo').innerText = `${currentFarmer.fpo} • +91 ${currentFarmer.phone}`;
-                    
-                    const myCount = listings.filter(l => l.phone === currentFarmer.phone || l.farmer_name === currentFarmer.name).length;
-                    document.getElementById('my-listings-count').innerText = myCount;
-                }
-
-                const fNameInput = document.getElementById('f_name');
-                const fFpoInput = document.getElementById('f_fpo');
-                if (fNameInput) fNameInput.value = currentFarmer.name;
-                if (fFpoInput) fFpoInput.value = currentFarmer.fpo;
-
-            } else {
-                authContainer.innerHTML = `
-                    <button onclick="openLoginModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                        <i class="fa-solid fa-user-lock mr-1.5"></i> Farmer Login
-                    </button>
-                `;
-
-                if (loginPromptBanner) loginPromptBanner.classList.remove('hidden');
-                if (loggedInProfile) loggedInProfile.classList.add('hidden');
-
-                const fNameInput = document.getElementById('f_name');
-                const fFpoInput = document.getElementById('f_fpo');
-                if (fNameInput) fNameInput.value = "";
-                if (fFpoInput) fFpoInput.value = "";
-            }
-        }
-
-        function openLoginModal() {
-            document.getElementById('farmerLoginModal').classList.remove('hidden');
-        }
-
-        function closeLoginModal() {
-            document.getElementById('farmerLoginModal').classList.add('hidden');
-        }
-
-        function fillLoginCreds(phone, name, fpo) {
-            document.getElementById('login_phone').value = phone;
-            document.getElementById('login_name').value = name;
-            document.getElementById('login_fpo').value = fpo;
-        }
-
-        function handleFarmerLogin(e) {
-            e.preventDefault();
-            const name = document.getElementById('login_name').value.trim();
-            const fpo = document.getElementById('login_fpo').value.trim();
-            const phone = document.getElementById('login_phone').value.trim();
-
-            currentFarmer = { name, fpo, phone };
-            localStorage.setItem('kisan_current_farmer', JSON.stringify(currentFarmer));
-
-            closeLoginModal();
-            renderAuthBar();
-            alert(`Welcome back, ${name}! Your e-KYC verified desk is ready.`);
-        }
-
-        function logoutFarmer() {
-            if (confirm("Are you sure you want to sign out?")) {
-                currentFarmer = null;
-                localStorage.removeItem('kisan_current_farmer');
-                renderAuthBar();
-            }
-        }
-
-        function openFarmerMyListingsModal() {
-            if (!currentFarmer) return;
-            const container = document.getElementById('my-listings-container');
-            container.innerHTML = '';
-
-            const myListings = listings.filter(l => l.phone === currentFarmer.phone || l.farmer_name === currentFarmer.name);
-
-            if (myListings.length === 0) {
-                container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">You have not published any harvest batches yet.</div>`;
-            } else {
-                myListings.forEach(item => {
-                    const row = document.createElement('div');
-                    row.className = "p-4 border rounded-xl bg-slate-50 flex justify-between items-center";
-                    row.innerHTML = `
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <p class="font-bold text-slate-800 text-sm">${item.crop}</p>
-                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Active Batch</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-1">Direct Price: <b>₹${item.base_price_kg}/kg</b> | Stock: <b>${item.quantity_kg.toLocaleString()} Kg</b></p>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Harvest Date: ${item.harvest_date}</p>
-                        </div>
-                        <div>
-                            <button onclick="removeListing(${item.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2.5 py-1 bg-red-50 hover:bg-red-100 rounded transition">
-                                <i class="fa-solid fa-trash mr-1"></i>Delist
-                            </button>
-                        </div>
-                    `;
-                    container.appendChild(row);
-                });
-            }
-
-            document.getElementById('myListingsModal').classList.remove('hidden');
-        }
-
-        function closeMyListingsModal() {
-            document.getElementById('myListingsModal').classList.add('hidden');
-        }
-
-        function removeListing(id) {
-            if (confirm("Are you sure you want to delist this harvest batch?")) {
-                listings = listings.filter(l => l.id !== id);
-                saveListings();
-                renderMarketplace();
-                openFarmerMyListingsModal();
-                renderAuthBar();
-            }
-        }
-
-        // Navigation Tab Switcher
-        function switchTab(btnElement, tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('bg-emerald-900', 'text-white', 'shadow-sm');
-                el.classList.add('text-emerald-100');
-            });
-            
-            const target = document.getElementById(`${tabName}-tab`);
-            if (target) target.classList.remove('hidden');
-
-            if (btnElement) {
-                btnElement.classList.add('bg-emerald-900', 'text-white', 'shadow-sm');
-                btnElement.classList.remove('text-emerald-100');
-            }
-
-            if (tabName === 'logistics') {
-                setTimeout(() => { 
-                    if (!map) initMap();
-                    else map.invalidateSize(); 
-                }, 200);
-            }
-            if (tabName === 'analytics') {
-                loadForecast('Tomato');
-            }
-        }
-
-        // Marketplace Render Logic
-        function renderMarketplace() {
-            const filter = document.getElementById('filter-crop').value;
-            const container = document.getElementById('listings-grid');
-            container.innerHTML = '';
-
-            const filtered = filter === 'All' 
-                ? listings 
-                : listings.filter(i => i.crop.toLowerCase().includes(filter.toLowerCase()));
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-3 text-center py-10 text-slate-400 text-sm">No active produce listings found matching "${filter}".</div>`;
-                return;
-            }
-
-            filtered.forEach(item => {
-                const farmerGain = (((item.base_price_kg - item.mandi_benchmark) / item.mandi_benchmark) * 100).toFixed(0);
-                const consumerSave = (((item.retail_benchmark - item.base_price_kg) / item.retail_benchmark) * 100).toFixed(0);
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col justify-between";
-                card.innerHTML = `
-                    <div>
-                        <div class="bg-slate-100/70 p-4 border-b flex justify-between items-center">
-                            <span class="text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">FPO Cluster Batch</span>
-                            <span class="text-xs text-slate-500"><i class="fa-solid fa-calendar mr-1"></i>${item.harvest_date}</span>
-                        </div>
-                        <div class="p-5">
-                            <h3 class="text-lg font-bold text-slate-900">${item.crop}</h3>
-                            <p class="text-xs text-slate-500 font-medium mb-3">${item.fpo} • ${item.farmer_name}</p>
-                            
-                            <div class="bg-slate-50 p-3 rounded-lg mb-4 space-y-1.5 text-xs">
-                                <div class="flex justify-between">
-                                    <span class="text-slate-500">Available Stock:</span>
-                                    <span class="font-bold text-slate-800">${item.quantity_kg.toLocaleString()} Kg</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-500">Local Mandi Benchmark:</span>
-                                    <span class="line-through text-slate-400">₹${item.mandi_benchmark}/kg</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-500">Retail Consumer Rate:</span>
-                                    <span class="line-through text-slate-400">₹${item.retail_benchmark}/kg</span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-baseline justify-between mb-4">
-                                <div>
-                                    <span class="text-2xl font-black text-emerald-700">₹${item.base_price_kg}</span>
-                                    <span class="text-xs text-slate-500">/ kg direct</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="block text-xs font-bold text-emerald-600">+${farmerGain}% Farmer Realization</span>
-                                    <span class="block text-xs font-bold text-indigo-600">-${consumerSave}% Consumer Saving</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-5 pt-0">
-                        <button onclick="openBuyModal(${item.id}, '${item.crop}', ${item.quantity_kg}, ${item.base_price_kg})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs sm:text-sm transition flex items-center justify-center shadow-sm">
-                            <i class="fa-solid fa-cart-shopping mr-2"></i> Direct Purchase (Escrow)
-                        </button>
-                    </div>`;
-                container.appendChild(card);
-            });
-        }
-
-        function submitListing(e) {
-            e.preventDefault();
-
-            if (!currentFarmer) {
-                alert("Please log in as a Farmer / FPO to publish your harvest batch!");
-                openLoginModal();
-                return;
-            }
-
-            const newEntry = {
-                id: listings.length + 1,
-                farmer_name: document.getElementById('f_name').value.trim(),
-                fpo: document.getElementById('f_fpo').value.trim(),
-                phone: currentFarmer.phone,
-                crop: document.getElementById('f_crop').value.trim(),
-                quantity_kg: parseFloat(document.getElementById('f_qty').value),
-                base_price_kg: parseFloat(document.getElementById('f_price').value),
-                mandi_benchmark: parseFloat(document.getElementById('f_mandi').value),
-                retail_benchmark: parseFloat(document.getElementById('f_retail').value),
-                lat: parseFloat(document.getElementById('f_lat').value),
-                lon: parseFloat(document.getElementById('f_lon').value),
-                harvest_date: document.getElementById('f_date').value
-            };
-
-            listings.push(newEntry);
-            saveListings();
-            alert("Harvest batch successfully published to National Direct Portal!");
-            document.getElementById('farmerForm').reset();
-            document.getElementById('f_lat').value = "20.0100";
-            document.getElementById('f_lon').value = "73.7900";
-            renderMarketplace();
-            renderAuthBar();
-
-            const defaultBtn = document.querySelector('.tab-btn');
-            switchTab(defaultBtn, 'marketplace');
-        }
-
-        function openBuyModal(id, crop, maxQty, price) {
-            document.getElementById('modal-listing-id').value = id;
-            document.getElementById('modal-crop-details').innerText = `${crop} | Direct Price: ₹${price}/kg (Available: ${maxQty} kg)`;
-            document.getElementById('b_qty').max = maxQty;
-            document.getElementById('b_qty').value = Math.min(100, maxQty);
-            document.getElementById('buyModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('buyModal').classList.add('hidden');
-        }
-
-        function confirmOrder(e) {
-            e.preventDefault();
-            const id = parseInt(document.getElementById('modal-listing-id').value);
-            const qty = parseFloat(document.getElementById('b_qty').value);
-
-            const target = listings.find(i => i.id === id);
-            if (target) {
-                if (target.quantity_kg < qty) {
-                    alert("Insufficient stock available for this order size.");
-                    return;
-                }
-                target.quantity_kg -= qty;
-                saveListings();
-                alert("Direct purchase confirmed! Funds placed into smart escrow until dispatch sign-off.");
-                closeModal();
-                renderMarketplace();
-                renderAuthBar();
-            }
-        }
-
-        // Map and CVRP Optimizer
-        function initMap() {
-            if (map) return;
-            map = L.map('map').setView([19.9975, 73.7898], 9);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            polylineLayer = L.layerGroup().addTo(map);
-            markersLayer = L.layerGroup().addTo(map);
-        }
-
-        function haversine(p1, p2) {
-            const R = 6371.0;
-            const dLat = (p2.lat - p1.lat) * Math.PI / 180;
-            const dLon = (p2.lon - p1.lon) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
-
-        function runRouteOptimization() {
-            if (!map) initMap();
-            polylineLayer.clearLayers();
-            markersLayer.clearLayers();
-
-            const depot = { name: "Central Consolidation Hub (Nashik City)", lat: 19.9975, lon: 73.7898 };
-            const stops = listings.map(l => ({
-                name: `${l.fpo} (${l.crop})`,
-                lat: l.lat,
-                lon: l.lon,
-                kg: l.quantity_kg
-            }));
-
-            let current = depot;
-            let unvisited = [...stops];
-            const orderedRoute = [depot];
-            let totalDistanceKm = 0.0;
-
-            while (unvisited.length > 0) {
-                let nearestIdx = 0;
-                let minDist = haversine(current, unvisited[0]);
-
-                for (let i = 1; i < unvisited.length; i++) {
-                    const dist = haversine(current, unvisited[i]);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        nearestIdx = i;
-                    }
-                }
-
-                totalDistanceKm += minDist;
-                orderedRoute.push(unvisited[nearestIdx]);
-                current = unvisited[nearestIdx];
-                unvisited.splice(nearestIdx, 1);
-            }
-
-            totalDistanceKm += haversine(current, depot);
-            orderedRoute.push(depot);
-
-            const latlngs = orderedRoute.map(stop => [stop.lat, stop.lon]);
-            const polyline = L.polyline(latlngs, { color: '#4f46e5', weight: 4, opacity: 0.85, dashArray: '6, 8' }).addTo(polylineLayer);
-            map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
-
-            orderedRoute.forEach((stop, idx) => {
-                const marker = L.marker([stop.lat, stop.lon]).addTo(markersLayer);
-                marker.bindPopup(`<b>Stop ${idx + 1}:</b> ${stop.name}`);
-            });
-
-            const statsContainer = document.getElementById('route-stats');
-            let stepsHtml = `
-                <div class="border-b pb-2">
-                    <p class="text-xs text-slate-400 font-bold uppercase">Estimated Consolidated Circuit</p>
-                    <p class="text-xl font-black text-slate-800">${totalDistanceKm.toFixed(2)} Km</p>
-                </div>
-                <div class="space-y-2 mt-3 max-h-56 overflow-y-auto">
-                    <p class="text-xs font-bold text-slate-600 uppercase">Optimized First-Mile Cluster Order:</p>`;
-            
-            orderedRoute.forEach((st, idx) => {
-                stepsHtml += `
-                <div class="flex items-center text-xs text-slate-700 py-1 border-b border-slate-100 last:border-none">
-                    <span class="w-5 h-5 flex-shrink-0 flex items-center justify-center bg-indigo-100 text-indigo-800 rounded-full font-bold mr-2 text-[10px]">${idx + 1}</span>
-                    <span class="truncate font-medium">${st.name}</span>
-                </div>`;
-            });
-            stepsHtml += `</div>`;
-            statsContainer.innerHTML = stepsHtml;
-        }
-
-        // Analytics & Forecasting
-        function loadForecast(crop) {
-            document.querySelectorAll('.crop-btn').forEach(btn => {
-                if (btn.innerText.includes(crop)) {
-                    btn.classList.add('bg-emerald-600', 'text-white');
-                    btn.classList.remove('bg-slate-200');
-                } else {
-                    btn.classList.remove('bg-emerald-600', 'text-white');
-                    btn.classList.add('bg-slate-200');
-                }
-            });
-
-            const cropLower = crop.toLowerCase();
-            const baseDemand = cropLower.includes('tomato') ? 3500 : cropLower.includes('onion') ? 6000 : 1500;
-            const basePrice = cropLower.includes('tomato') ? 22 : cropLower.includes('onion') ? 26 : 45;
-
-            const dates = [];
-            const demandKg = [];
-            const prices = [];
-            const today = new Date();
-
-            for (let i = 0; i < 7; i++) {
-                const day = new Date(today);
-                day.setDate(today.getDate() + i);
-                dates.push(day.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }));
-                
-                const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-                const weekendFactor = isWeekend ? 1.25 : 1.0;
-                
-                const projectedDemand = Math.round(baseDemand * (1 + 0.05 * Math.sin(i)) * weekendFactor);
-                const projectedPrice = parseFloat((basePrice * (1 + 0.02 * Math.cos(i) + (isWeekend ? 0.04 : 0))).toFixed(1));
-                
-                demandKg.push(projectedDemand);
-                prices.push(projectedPrice);
-            }
-
-            document.getElementById('ai-rec-text').innerHTML = 
-                `<strong>Market Intelligence:</strong> Optimal harvest release window for <strong>${crop}</strong> is Days 5 to 7 to capture weekend urban demand spikes at peak corridor prices.`;
-
-            if (demandChartInstance) demandChartInstance.destroy();
-            const ctxDemand = document.getElementById('demandChart').getContext('2d');
-            demandChartInstance = new Chart(ctxDemand, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: `${crop} Projected Demand (Kg)`,
-                        data: demandKg,
-                        borderColor: '#059669',
-                        backgroundColor: 'rgba(5, 150, 105, 0.15)',
-                        fill: true,
-                        tension: 0.35
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-
-            if (priceChartInstance) priceChartInstance.destroy();
-            const ctxPrice = document.getElementById('priceChart').getContext('2d');
-            priceChartInstance = new Chart(ctxPrice, {
-                type: 'bar',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: `${crop} Fair Corridor Price (₹/kg)`,
-                        data: prices,
-                        backgroundColor: '#4f46e5'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-        }
-
-        // ==============================================
-        // AI CHATBOT ENGINE (GROUNDED DOMAIN ASSISTANT)
-        // ==============================================
-        function toggleChat() {
-            const win = document.getElementById('ai-chat-window');
-            win.style.display = (win.style.display === 'none' || win.style.display === '') ? 'flex' : 'none';
-        }
-
-        function sendQuickPrompt(text) {
-            document.getElementById('chat-input').value = text;
-            handleSend();
-        }
-
-        function appendMessage(sender, text) {
-            const msgContainer = document.getElementById('chat-messages');
-            const div = document.createElement('div');
-            div.className = `chat-bubble p-3 rounded-xl max-w-[85%] text-xs leading-relaxed ${
-                sender === 'user' 
-                    ? 'bg-emerald-700 text-white self-end ml-auto rounded-br-none shadow-sm' 
-                    : 'bg-white border border-slate-200 text-slate-800 self-start shadow-sm rounded-bl-none'
-            }`;
-            div.innerHTML = text;
-            msgContainer.appendChild(div);
-            msgContainer.scrollTop = msgContainer.scrollHeight;
-        }
-
-        // Domain Knowledge Response Engine
-        function generateLocalAIResponse(query) {
-            const q = query.toLowerCase();
-
-            if (q.includes('corridor') || q.includes('price') || q.includes('mandi') || q.includes('rate')) {
-                return `<b>How KisanSetu Price Corridors Work:</b><br>
-                Instead of middleman commission (traditionally 15-25%), KisanSetu establishes an algorithmic price corridor:
-                <ul class="list-disc ml-4 mt-1 space-y-1">
-                    <li><b>Floor (Farmer Price):</b> Guaranteed +20% to +30% above prevailing APMC Mandi rates.</li>
-                    <li><b>Ceiling (Consumer Price):</b> 15% to 25% lower than traditional retail supermarket prices.</li>
-                    <li>Middleman extraction is reduced to <b>0%</b> via escrow contract settlement.</li>
-                </ul>`;
-            }
-
-            if (q.includes('cvrp') || q.includes('route') || q.includes('logistics') || q.includes('truck') || q.includes('spoilage')) {
-                return `<b>First-Mile CVRP Clustering:</b><br>
-                Smallholder farmers often lose up to 25% of fresh produce due to fragmented single-vehicle trips. Our <i>Capacitated Vehicle Routing Problem (CVRP)</i> engine clusters neighbouring FPO lots along a shared route, bringing collection costs down by ~35% and post-harvest spoilage below 8%.`;
-            }
-
-            if (q.includes('stock') || q.includes('available') || q.includes('produce') || q.includes('inventory')) {
-                const stockSummary = listings.map(l => `• <b>${l.crop}</b>: ${l.quantity_kg.toLocaleString()} Kg @ ₹${l.base_price_kg}/kg (${l.fpo})`).join('<br>');
-                return `<b>Live Verified Portal Inventory:</b><br>${stockSummary}<br><br><i>Switch to the "Buyer Market" tab to order with escrow.</i>`;
-            }
-
-            if (q.includes('kyc') || q.includes('register') || q.includes('farmer') || q.includes('login')) {
-                return `<b>Farmer Registration & e-KYC:</b><br>
-                1. Click <b>"Farmer Desk"</b> or the <b>"Farmer Login"</b> button.<br>
-                2. Enter your 10-digit Kisan ID / Mobile number and OTP (Demo: <i>1234</i>).<br>
-                3. Once e-KYC verified, list harvest batches specifying direct floor rate, mandi benchmark, and GPS coordinates for automated pickup.`;
-            }
-
-            if (q.includes('tomato') || q.includes('storage') || q.includes('onion') || q.includes('capsicum')) {
-                return `<b>Agronomic Handling & Storage Standards:</b><br>
-                • <b>Tomato:</b> Store at 12-15°C with 85-90% RH. Avoid cold injury below 10°C.<br>
-                • <b>Red Onion:</b> Ensure well-ventilated dry curing; avoid moisture condensation to prevent black mold.<br>
-                • <b>Capsicum:</b> Rapid precooling at 7-10°C ensures turgidity and prevents weight loss.`;
-            }
-
-            return `I understand you are asking about: <i>"${query}"</i>.<br><br>
-            On KisanSetu, you can directly connect farm gate supply to urban clusters, run CVRP first-mile route clustering, and inspect predictive 7-day fair price corridors. Try clicking one of the quick suggestions above!`;
-        }
-
-        async function handleSend() {
-            const input = document.getElementById('chat-input');
-            const userText = input.value.trim();
-            if (!userText) return;
-
-            appendMessage('user', userText);
-            input.value = '';
-
-            // Render thinking indicator
-            const msgContainer = document.getElementById('chat-messages');
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.className = 'chat-bubble bg-slate-200 text-slate-600 p-2.5 rounded-xl max-w-[60%] text-xs italic self-start';
-            thinkingDiv.id = 'thinking-indicator';
-            thinkingDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing query...`;
-            msgContainer.appendChild(thinkingDiv);
-            msgContainer.scrollTop = msgContainer.scrollHeight;
-
-            setTimeout(() => {
-                const indicator = document.getElementById('thinking-indicator');
-                if (indicator) indicator.remove();
-                const reply = generateLocalAIResponse(userText);
-                appendMessage('bot', reply);
-            }, 550);
-        }
-
-        // Voice Input (Speech-to-Text)
-        function startVoiceRecognition() {
-            const voiceBtn = document.getElementById('voice-btn');
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-            if (!SpeechRecognition) {
-                alert("Speech recognition is not supported by your current browser. Please use Chrome or Edge.");
-                return;
-            }
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-IN';
-            recognition.interimResults = false;
-
-            recognition.onstart = () => {
-                voiceBtn.classList.add('text-red-500', 'animate-pulse');
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('chat-input').value = transcript;
-                handleSend();
-            };
-
-            recognition.onerror = () => {
-                voiceBtn.classList.remove('text-red-500', 'animate-pulse');
-            };
-
-            recognition.onend = () => {
-                voiceBtn.classList.remove('text-red-500', 'animate-pulse');
-            };
-
-            recognition.start();
-        }
-
-        // Initialization
-        window.addEventListener('DOMContentLoaded', () => {
-            renderAuthBar();
-            renderMarketplace();
-            const dateInput = document.getElementById('f_date');
-            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-        });
-    </script>
+        body.innerHTML += `<div class="chat-msg bot">${reply}</div>`;
+        body.scrollTop = body.scrollHeight;
+      }, 400);
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMarket();
+    });
+  </script>
 </body>
 </html>
