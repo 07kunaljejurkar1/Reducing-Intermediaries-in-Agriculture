@@ -20,6 +20,10 @@
       --accent: #f59e0b;
       --bg: #f8fafc;
       --surface: #ffffff;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: #1e293b;
+      --sidebar-text: #94a3b8;
+      --sidebar-text-active: #ffffff;
       --text: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
@@ -28,113 +32,190 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.5; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
 
-    /* Header */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+    /* Left Sidebar Navigation */
+    aside.sidebar {
+      width: 270px;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
       position: sticky;
       top: 0;
-      z-index: 50;
+      height: 100vh;
+      border-right: 1px solid #334155;
+      z-index: 100;
     }
-    .header-container {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0.85rem 1.5rem;
+
+    .sidebar-header {
+      padding: 1.5rem 1.25rem;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
+      gap: 0.8rem;
+      border-bottom: 1px solid #1e293b;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       background: var(--primary);
       color: #fff;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+      flex-shrink: 0;
     }
-    .brand-text h1 { font-size: 1.25rem; font-weight: 700; color: var(--primary-dark); }
-    .brand-text p { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* Navigation */
-    nav { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 2px; }
+    .brand-info h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.2;
+    }
+
+    .brand-info p {
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Sidebar Navigation Links */
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 0.8rem;
+      gap: 0.4rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .menu-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #475569;
+      padding: 0.6rem 0.8rem 0.2rem;
+    }
+
     .nav-btn {
-      background: none;
-      border: 1px solid transparent;
-      padding: 0.55rem 0.9rem;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--sidebar-text);
+      padding: 0.75rem 1rem;
       border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.85rem;
       transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .nav-btn:hover { background: var(--border); color: var(--text); }
-    .nav-btn.active {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      border-color: rgba(21, 128, 61, 0.2);
+      text-align: left;
+      width: 100%;
     }
 
-    /* Main Container */
-    main {
-      max-width: 1280px;
-      margin: 1.5rem auto;
-      padding: 0 1.5rem;
-      min-height: 75vh;
+    .nav-btn i {
+      font-size: 1.05rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-btn:hover {
+      background: var(--sidebar-hover);
+      color: #f8fafc;
+    }
+
+    .nav-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(21, 128, 61, 0.35);
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid #1e293b;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /* Main Content Area */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow-y: auto;
+    }
+
+    header.top-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-bar .breadcrumb {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .top-bar .breadcrumb span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .top-bar .status-badge {
+      font-size: 0.75rem;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    main.content-body {
+      padding: 2rem;
+      flex: 1;
+      max-width: 1350px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     .tab-pane { display: none; }
     .tab-pane.active { display: block; animation: fadeIn 0.25s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* UI Components */
-    .section-title {
-      margin-bottom: 1.25rem;
-    }
-    .section-title h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); }
-    .section-title p { font-size: 0.9rem; color: var(--text-muted); }
+    /* UI Cards and Layouts */
+    .section-title { margin-bottom: 1.5rem; }
+    .section-title h2 { font-size: 1.45rem; font-weight: 700; color: var(--text); }
+    .section-title p { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.2rem; }
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
     }
+
     .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-      box-shadow: var(--shadow);
-    }
-    .stat-card .label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; }
-    .stat-card .value { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); margin-top: 0.35rem; }
-    .stat-card .sub { font-size: 0.75rem; color: #16a34a; margin-top: 0.2rem; }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -142,15 +223,37 @@
       box-shadow: var(--shadow);
     }
 
-    /* Tables & Lists */
+    .stat-card .label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .stat-card .value { font-size: 1.45rem; font-weight: 700; color: var(--primary-dark); margin-top: 0.4rem; }
+    .stat-card .sub { font-size: 0.78rem; color: #16a34a; margin-top: 0.25rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 980px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      aside.sidebar { width: 220px; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* Tables */
     .table-wrapper { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
-    th, td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); }
-    th { background: #f1f5f9; color: var(--text-muted); font-weight: 600; }
-    
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
+    th, td { padding: 0.8rem 0.9rem; border-bottom: 1px solid var(--border); }
+    th { background: #f8fafc; color: var(--text-muted); font-weight: 600; }
+
     .badge {
       display: inline-block;
-      padding: 0.2rem 0.5rem;
+      padding: 0.22rem 0.55rem;
       font-size: 0.75rem;
       font-weight: 600;
       border-radius: 20px;
@@ -158,12 +261,12 @@
     .badge-green { background: #dcfce7; color: #15803d; }
     .badge-blue { background: #dbeafe; color: #1d4ed8; }
 
-    /* Form Styles */
+    /* Form Inputs */
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
     .form-control {
       width: 100%;
-      padding: 0.6rem 0.8rem;
+      padding: 0.65rem 0.85rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 0.9rem;
@@ -172,7 +275,7 @@
     .form-control:focus { border-color: var(--primary); }
 
     .btn {
-      padding: 0.6rem 1.2rem;
+      padding: 0.65rem 1.25rem;
       background: var(--primary);
       color: #fff;
       border: none;
@@ -185,23 +288,21 @@
       transition: background 0.2s;
     }
     .btn:hover { background: var(--primary-dark); }
-    .btn-secondary { background: #64748b; }
-    .btn-secondary:hover { background: #475569; }
 
-    /* AI Chatbot Float */
+    /* Floating Chatbot */
     .chat-widget {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      z-index: 100;
+      z-index: 200;
     }
     .chat-toggle {
       background: var(--primary-dark);
       color: #fff;
       border: none;
-      padding: 0.8rem 1.2rem;
+      padding: 0.8rem 1.25rem;
       border-radius: 30px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.25);
       cursor: pointer;
       font-weight: 600;
       display: flex;
@@ -210,19 +311,19 @@
     }
     .chat-window {
       display: none;
-      width: 340px;
-      height: 420px;
+      width: 350px;
+      height: 430px;
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 12px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
       flex-direction: column;
       margin-bottom: 12px;
     }
     .chat-header {
       background: var(--primary);
       color: #fff;
-      padding: 0.85rem;
+      padding: 0.9rem 1rem;
       border-radius: 12px 12px 0 0;
       display: flex;
       justify-content: space-between;
@@ -232,270 +333,289 @@
     }
     .chat-body {
       flex: 1;
-      padding: 0.85rem;
+      padding: 0.9rem;
       overflow-y: auto;
       font-size: 0.85rem;
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
     }
-    .chat-msg { padding: 0.55rem 0.75rem; border-radius: 8px; max-width: 85%; }
+    .chat-msg { padding: 0.55rem 0.8rem; border-radius: 8px; max-width: 85%; }
     .chat-msg.bot { background: #f1f5f9; align-self: flex-start; }
     .chat-msg.user { background: var(--primary-light); color: var(--primary-dark); align-self: flex-end; }
     .chat-input { display: flex; border-top: 1px solid var(--border); }
-    .chat-input input { flex: 1; border: none; padding: 0.65rem; outline: none; }
-    .chat-input button { border: none; background: var(--primary); color: #fff; padding: 0 0.9rem; cursor: pointer; }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border);
-      background: #fff;
-      padding: 1.5rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 3rem;
-    }
+    .chat-input input { flex: 1; border: none; padding: 0.75rem; outline: none; font-size: 0.85rem; }
+    .chat-input button { border: none; background: var(--primary); color: #fff; padding: 0 1.1rem; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- Top Header & Navigation -->
-  <header>
-    <div class="header-container">
-      <div class="brand">
-        <div class="brand-icon"><i class="fa-solid fa-wheat-awn"></i></div>
-        <div class="brand-text">
-          <h1>KisanSetu Portal</h1>
-          <p>Dept. of Consumer Affairs (DoCA) • Problem ID 26033</p>
-        </div>
+  <!-- ==================== LEFT SIDEBAR ==================== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+      <div class="brand-info">
+        <h1>KisanSetu</h1>
+        <p>Problem ID 26033 • DoCA</p>
       </div>
-
-      <!-- Navigation tabs in the requested sequence -->
-      <nav id="nav-tabs">
-        <button class="nav-btn active" onclick="showTab('dashboard')">
-          <i class="fa-solid fa-chart-pie"></i> Dashboard
-        </button>
-        <button class="nav-btn" onclick="showTab('buyer-market')">
-          <i class="fa-solid fa-store"></i> Buyer Market
-        </button>
-        <button class="nav-btn" onclick="showTab('farmer-desk')">
-          <i class="fa-solid fa-tractor"></i> Farmer Desk
-        </button>
-        <button class="nav-btn" onclick="showTab('route-engine')">
-          <i class="fa-solid fa-route"></i> AI Route Engine
-        </button>
-        <button class="nav-btn" onclick="showTab('demand-forecast')">
-          <i class="fa-solid fa-chart-line"></i> Demand Forecast
-        </button>
-      </nav>
     </div>
-  </header>
 
-  <main>
-    <!-- ==================== 1. DASHBOARD ==================== -->
-    <section id="dashboard" class="tab-pane active">
-      <div class="section-title">
-        <h2>Supply Chain Overview & Impact Dashboard</h2>
-        <p>Live national aggregation metrics, fair price realization, and intermediary reduction statistics.</p>
+    <div class="sidebar-menu">
+      <div class="menu-label">Main Navigation</div>
+
+      <!-- 1. Dashboard -->
+      <button class="nav-btn active" onclick="showTab('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </button>
+
+      <!-- 2. Buyer Market -->
+      <button class="nav-btn" onclick="showTab('buyer-market')">
+        <i class="fa-solid fa-store"></i>
+        <span>Buyer Market</span>
+      </button>
+
+      <!-- 3. Farmer Desk -->
+      <button class="nav-btn" onclick="showTab('farmer-desk')">
+        <i class="fa-solid fa-tractor"></i>
+        <span>Farmer Desk</span>
+      </button>
+
+      <!-- 4. AI Route Engine -->
+      <button class="nav-btn" onclick="showTab('route-engine')">
+        <i class="fa-solid fa-route"></i>
+        <span>AI Route Engine</span>
+      </button>
+
+      <!-- 5. Demand Forecast -->
+      <button class="nav-btn" onclick="showTab('demand-forecast')">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Demand Forecast</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <p><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> DoCA API Connected</p>
+      <p style="margin-top: 4px;">Direct Farm-Gate Protocol</p>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN DISPLAY AREA ==================== -->
+  <div class="app-main">
+    <header class="top-bar">
+      <div class="breadcrumb">
+        Portal / <span id="current-view-name">Dashboard</span>
       </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="label">Farmer Realization</div>
-          <div class="value">+28.4%</div>
-          <div class="sub"><i class="fa-solid fa-arrow-trend-up"></i> Above APMC Mandi Rates</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Consumer Savings</div>
-          <div class="value">21.5% Off</div>
-          <div class="sub"><i class="fa-solid fa-arrow-trend-down"></i> Relative to Urban Retail</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Middleman Extraction</div>
-          <div class="value">0.0%</div>
-          <div class="sub">Direct Settlement Escrow</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Spoilage Prevention</div>
-          <div class="value">&lt; 7.8%</div>
-          <div class="sub"><i class="fa-solid fa-truck-fast"></i> First-Mile CVRP Clustering</div>
-        </div>
+      <div class="status-badge">
+        <i class="fa-solid fa-shield-halved"></i> Intermediary Extraction: 0% Active
       </div>
+    </header>
 
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Real-Time Platform Activity</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>FPO / Cluster</th>
-                  <th>Produce</th>
-                  <th>Quantity</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="dash-activity-body">
-                <tr>
-                  <td>Nashik Agri FPO</td>
-                  <td>Grade-A Tomato</td>
-                  <td>1,800 kg</td>
-                  <td><span class="badge badge-green">In Dispatch</span></td>
-                </tr>
-                <tr>
-                  <td>Sangamner Sahakari</td>
-                  <td>Red Onion</td>
-                  <td>4,200 kg</td>
-                  <td><span class="badge badge-blue">Aggregating</span></td>
-                </tr>
-                <tr>
-                  <td>Pune Rural Farmers</td>
-                  <td>Green Capsicum</td>
-                  <td>950 kg</td>
-                  <td><span class="badge badge-green">Allocated</span></td>
-                </tr>
-              </tbody>
-            </table>
+    <main class="content-body">
+      <!-- 1. DASHBOARD -->
+      <section id="dashboard" class="tab-pane active">
+        <div class="section-title">
+          <h2>Supply Chain Dashboard</h2>
+          <p>National aggregation performance, fair price realization metrics, and CVRP vehicle efficiency.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="label">Farmer Realization</div>
+            <div class="value">+28.4%</div>
+            <div class="sub"><i class="fa-solid fa-arrow-trend-up"></i> Above APMC Mandi Rates</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Consumer Savings</div>
+            <div class="value">21.5% Off</div>
+            <div class="sub"><i class="fa-solid fa-arrow-trend-down"></i> Relative to Urban Retail</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Middleman Markup</div>
+            <div class="value">0.0%</div>
+            <div class="sub">Direct Settlement Escrow</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Spoilage Prevention</div>
+            <div class="value">&lt; 7.8%</div>
+            <div class="sub"><i class="fa-solid fa-truck-fast"></i> First-Mile CVRP Clustering</div>
           </div>
         </div>
 
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Regulatory Compliance & Fair Corridor</h3>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
-            Automatic price collars trigger whenever farm gate payouts fall below regional cultivation costs + 50% MSP target guidelines.
-          </p>
-          <div style="background: var(--bg); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--primary);">
-            <p style="font-size: 0.85rem; font-weight: 600;">System Advisory ID #26033-DOCA</p>
-            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem;">
-              All clusters currently operating within safe corridor tolerances. Zero intermediary arbitrations pending.
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Real-Time Platform Activity</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cluster</th>
+                    <th>Produce</th>
+                    <th>Volume</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-activity-body">
+                  <tr>
+                    <td>Nashik Agri FPO</td>
+                    <td>Grade-A Tomato</td>
+                    <td>1,800 kg</td>
+                    <td><span class="badge badge-green">In Dispatch</span></td>
+                  </tr>
+                  <tr>
+                    <td>Sangamner Sahakari</td>
+                    <td>Red Onion</td>
+                    <td>4,200 kg</td>
+                    <td><span class="badge badge-blue">Aggregating</span></td>
+                  </tr>
+                  <tr>
+                    <td>Pune Rural Farmers</td>
+                    <td>Green Capsicum</td>
+                    <td>950 kg</td>
+                    <td><span class="badge badge-green">Allocated</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Regulatory Price Corridor Notice</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Automated fair price collars actively monitor trade bids to protect farmer livelihoods from localized distress dumping.
+            </p>
+            <div style="background: var(--bg); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--primary);">
+              <p style="font-size: 0.85rem; font-weight: 600;">System Protocol ID #26033-DOCA</p>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem;">
+                All verified clusters operating safely within allowable corridor bounds.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. BUYER MARKET -->
+      <section id="buyer-market" class="tab-pane">
+        <div class="section-title">
+          <h2>Direct Buyer Market Catalog</h2>
+          <p>Order fresh farm harvests directly at audited corridor rates without middleman commission.</p>
+        </div>
+
+        <div class="stats-grid" id="market-listings">
+          <!-- Dynamic Produce Cards -->
+        </div>
+      </section>
+
+      <!-- 3. FARMER DESK -->
+      <section id="farmer-desk" class="tab-pane">
+        <div class="section-title">
+          <h2>Farmer & FPO Desk</h2>
+          <p>Publish fresh harvest lots straight into the national aggregation pipeline.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> List New Harvest Batch</h3>
+            <form id="add-harvest-form" onsubmit="handleHarvestSubmit(event)">
+              <div class="form-group">
+                <label>Crop / Produce</label>
+                <select id="f-crop" class="form-control" required>
+                  <option value="Tomato">Grade-A Tomato</option>
+                  <option value="Onion">Red Onion</option>
+                  <option value="Capsicum">Green Capsicum</option>
+                  <option value="Potato">Seed Potato</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Volume (Kg)</label>
+                <input type="number" id="f-qty" class="form-control" placeholder="e.g. 2000" required min="100">
+              </div>
+              <div class="form-group">
+                <label>Corridor Ask Price (₹/kg)</label>
+                <input type="number" id="f-price" class="form-control" placeholder="e.g. 25" required min="1">
+              </div>
+              <div class="form-group">
+                <label>Farm Node / Location</label>
+                <input type="text" id="f-loc" class="form-control" placeholder="e.g. Dindori, Nashik" required>
+              </div>
+              <button type="submit" class="btn"><i class="fa-solid fa-upload"></i> Publish to Buyer Market</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-id-card" style="color: var(--accent);"></i> Authenticated FPO Node</h3>
+            <div style="background: var(--bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+              <p style="font-weight: 600; font-size: 0.9rem;">Sahyadri Farmers Cooperative Ltd.</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">UIDAI e-KYC: <span class="badge badge-green">Verified</span> • Mandi ID: DOCA-44821</p>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+              Lots listed via this desk automatically sync into the <strong>CVRP Route Optimization Engine</strong> for route grouping and cold-chain truck allocation.
             </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ==================== 2. BUYER MARKET ==================== -->
-    <section id="buyer-market" class="tab-pane">
-      <div class="section-title">
-        <h2>Direct Farm Catalog</h2>
-        <p>Procure fresh harvests directly from verified farm clusters at transparent fair price corridors.</p>
-      </div>
-
-      <div class="stats-grid" id="market-listings">
-        <!-- Dynamic Cards populated via JS -->
-      </div>
-    </section>
-
-    <!-- ==================== 3. FARMER DESK ==================== -->
-    <section id="farmer-desk" class="tab-pane">
-      <div class="section-title">
-        <h2>Farmer & FPO Aggregation Desk</h2>
-        <p>Authenticate e-KYC credentials and publish fresh harvest batches directly to buyers.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Publish New Harvest Batch</h3>
-          <form id="add-harvest-form" onsubmit="handleHarvestSubmit(event)">
-            <div class="form-group">
-              <label>Crop / Produce</label>
-              <select id="f-crop" class="form-control" required>
-                <option value="Tomato">Grade-A Tomato</option>
-                <option value="Onion">Red Onion</option>
-                <option value="Capsicum">Green Capsicum</option>
-                <option value="Potato">Seed Potato</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Harvest Volume (Kg)</label>
-              <input type="number" id="f-qty" class="form-control" placeholder="e.g. 1500" required min="100">
-            </div>
-            <div class="form-group">
-              <label>Corridor Ask Price (₹/kg)</label>
-              <input type="number" id="f-price" class="form-control" placeholder="e.g. 24" required min="1">
-            </div>
-            <div class="form-group">
-              <label>Pickup Location / Cluster</label>
-              <input type="text" id="f-loc" class="form-control" placeholder="e.g. Dindori, Nashik" required>
-            </div>
-            <button type="submit" class="btn"><i class="fa-solid fa-upload"></i> List Harvest Direct</button>
-          </form>
+      <!-- 4. AI ROUTE ENGINE -->
+      <section id="route-engine" class="tab-pane">
+        <div class="section-title">
+          <h2>AI Route Engine & Aggregation Optimizer</h2>
+          <p>Heuristic Capacitated Vehicle Routing Problem (CVRP) clustering farm pickup nodes.</p>
         </div>
 
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-id-card" style="color: var(--accent);"></i> Authenticated FPO Node</h3>
-          <div style="background: var(--bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <p style="font-weight: 600; font-size: 0.9rem;">Sahyadri Farmers Cooperative Ltd.</p>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">UIDAI e-KYC: <span class="badge badge-green">Verified</span> • Kisan Credit Card: Linked</p>
-          </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
-            All lots listed through this desk are automatically enrolled in the <strong>First-Mile CVRP Cluster Optimizer</strong> for grouped vehicle dispatch.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== 4. AI ROUTE ENGINE ==================== -->
-    <section id="route-engine" class="tab-pane">
-      <div class="section-title">
-        <h2>AI Route Engine & Aggregation Optimizer</h2>
-        <p>Heuristic Capacitated Vehicle Routing Problem (CVRP) clustering farm pickup nodes to minimize delay and transit waste.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-bottom: 0.8rem; font-size: 1.05rem;">Active Node Clustering</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-            Optimizes pickup itineraries using vehicle weight capacities (max 5,000 kg/vehicle) and maximum transit freshness windows.
-          </p>
-          <button class="btn" onclick="runRouteOptimization()"><i class="fa-solid fa-microchip"></i> Run Route Optimization</button>
-          
-          <div id="route-results" style="margin-top: 1.25rem; font-size: 0.88rem; display: none;">
-            <div style="background: var(--primary-light); color: var(--primary-dark); padding: 0.8rem; border-radius: 8px; margin-bottom: 0.8rem;">
-              <strong>Optimal Solution Converged:</strong> 2 clustered multi-stop loops generated.
-            </div>
-            <ul style="padding-left: 1.2rem; color: var(--text-muted); line-height: 1.8;">
-              <li><strong>Truck A (Capacity: 88%):</strong> Sangamner Node → Sinnar Hub → Pune Terminal</li>
-              <li><strong>Truck B (Capacity: 92%):</strong> Dindori Node → Ojhar Center → Mumbai DC</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-leaf" style="color: #16a34a;"></i> Waste Minimization Impact</h3>
-          <div style="padding: 1.5rem; background: var(--bg); border-radius: 8px; text-align: center;">
-            <div style="font-size: 2.2rem; font-weight: 700; color: var(--primary);">35.2%</div>
-            <p style="font-size: 0.85rem; font-weight: 600; margin-top: 0.2rem;">Transit Time Reduction</p>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
-              Clustered multi-farmer pickups eliminate cold-chain idle times and keep transit degradation below 8%.
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="margin-bottom: 0.8rem; font-size: 1.05rem;">First-Mile Clustering Algorithm</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Groups regional farmers with shared cold-transit corridors to curb empty-mile logistics and cut deadheading costs.
             </p>
+            <button class="btn" onclick="runRouteOptimization()"><i class="fa-solid fa-microchip"></i> Run Route Optimization</button>
+            
+            <div id="route-results" style="margin-top: 1.25rem; font-size: 0.88rem; display: none;">
+              <div style="background: var(--primary-light); color: var(--primary-dark); padding: 0.85rem; border-radius: 8px; margin-bottom: 0.8rem;">
+                <strong>CVRP Solution Converged:</strong> 2 multi-stop loops generated across active clusters.
+              </div>
+              <ul style="padding-left: 1.2rem; color: var(--text-muted); line-height: 1.8;">
+                <li><strong>Vehicle A (Capacity: 88%):</strong> Sangamner Node → Sinnar Hub → Pune Terminal</li>
+                <li><strong>Vehicle B (Capacity: 92%):</strong> Dindori Node → Ojhar Center → Mumbai DC</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-leaf" style="color: #16a34a;"></i> Spoilage Reduction Metrics</h3>
+            <div style="padding: 1.75rem; background: var(--bg); border-radius: 8px; text-align: center;">
+              <div style="font-size: 2.3rem; font-weight: 700; color: var(--primary);">35.2%</div>
+              <p style="font-size: 0.88rem; font-weight: 600; margin-top: 0.2rem;">Transit Time Saved</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                Direct node-to-hub clustering cuts transit delays, keeping post-harvest damage under 8%.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ==================== 5. DEMAND FORECAST ==================== -->
-    <section id="demand-forecast" class="tab-pane">
-      <div class="section-title">
-        <h2>AI Demand & Corridor Price Engine</h2>
-        <p>7-Day arrival-based predictive elasticity, Mandi price projections, and fair corridors.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;">7-Day Demand Projection (Metric Tons)</h3>
-          <canvas id="demandChart" height="200"></canvas>
+      <!-- 5. DEMAND FORECAST -->
+      <section id="demand-forecast" class="tab-pane">
+        <div class="section-title">
+          <h2>AI Demand & Price Corridor Engine</h2>
+          <p>7-Day arrival predictive elasticity, Mandi price forecasting, and floor protection corridors.</p>
         </div>
-        <div class="card">
-          <h3 style="margin-bottom: 1rem; font-size: 1.05rem;">Fair Price Corridor (₹/kg) vs Mandi Spot</h3>
-          <canvas id="priceChart" height="200"></canvas>
-        </div>
-      </div>
-    </section>
-  </main>
 
-  <!-- KisanSetu AI Advisor Chatbot Floating Widget -->
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;">7-Day Demand Forecast (Metric Tons)</h3>
+            <canvas id="demandChart" height="200"></canvas>
+          </div>
+          <div class="card">
+            <h3 style="margin-bottom: 1rem; font-size: 1.05rem;">Fair Corridor Price vs APMC Mandi Spot (₹/kg)</h3>
+            <canvas id="priceChart" height="200"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- AI Advisor Floating Bot -->
   <div class="chat-widget">
     <div class="chat-window" id="chatWindow">
       <div class="chat-header">
@@ -504,7 +624,7 @@
       </div>
       <div class="chat-body" id="chatBody">
         <div class="chat-msg bot">
-          Namaste! I am your KisanSetu advisor. Ask me about mandi corridors, CVRP route pickups, or crop fair pricing!
+          Namaste! I am your KisanSetu Advisor. Ask me about corridor price bounds, first-mile CVRP clusters, or crop listings.
         </div>
       </div>
       <div class="chat-input">
@@ -517,20 +637,23 @@
     </button>
   </div>
 
-  <footer>
-    <p>© 2026 KisanSetu Portal • Department of Consumer Affairs (DoCA) Initiative • Direct Farm Gate Sales & CVRP Clustering</p>
-  </footer>
-
-  <!-- Script Logic -->
+  <!-- Scripts -->
   <script>
-    // In-memory catalog state
+    const labels = {
+      'dashboard': 'Dashboard',
+      'buyer-market': 'Buyer Market',
+      'farmer-desk': 'Farmer Desk',
+      'route-engine': 'AI Route Engine',
+      'demand-forecast': 'Demand Forecast'
+    };
+
     let catalog = [
       { id: 1, crop: "Grade-A Tomato", qty: 2400, price: 26, loc: "Nashik Cluster", rating: "4.9" },
       { id: 2, crop: "Red Onion", qty: 5000, price: 21, loc: "Lasalgaon Hub", rating: "4.8" },
       { id: 3, crop: "Green Capsicum", qty: 1200, price: 38, loc: "Pune Farm Belt", rating: "4.7" }
     ];
 
-    // 1. Tab Switching Function
+    // Tab Switching
     function showTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -538,36 +661,38 @@
       const targetSection = document.getElementById(tabId);
       if (targetSection) targetSection.classList.add('active');
 
-      const clickedBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => 
+      const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => 
         b.getAttribute('onclick')?.includes(`'${tabId}'`)
       );
-      if (clickedBtn) clickedBtn.classList.add('active');
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.getElementById('current-view-name').textContent = labels[tabId] || 'Portal';
 
       if (tabId === 'demand-forecast') {
         initCharts();
       }
     }
 
-    // 2. Render Buyer Market
+    // Render Buyer Catalog
     function renderMarket() {
       const container = document.getElementById('market-listings');
       container.innerHTML = catalog.map(item => `
         <div class="stat-card">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="badge badge-green">${item.crop}</span>
             <span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-star" style="color:var(--accent);"></i> ${item.rating}</span>
           </div>
-          <div class="value" style="margin-top:0.8rem;">₹${item.price} <span style="font-size:0.85rem; font-weight:normal; color:var(--text-muted);">/ kg</span></div>
+          <div class="value" style="margin-top:0.75rem;">₹${item.price} <span style="font-size:0.85rem; font-weight:normal; color:var(--text-muted);">/ kg</span></div>
           <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;"><i class="fa-solid fa-location-dot"></i> ${item.loc}</p>
-          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.1rem;"><i class="fa-solid fa-boxes-stacked"></i> Batch Available: ${item.qty.toLocaleString()} kg</p>
-          <button class="btn" style="width:100%; margin-top:1rem; justify-content:center; font-size:0.85rem;" onclick="alert('Procurement order locked for ${item.crop} directly with cluster escrow.')">
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.15rem;"><i class="fa-solid fa-boxes-stacked"></i> Batch: ${item.qty.toLocaleString()} kg</p>
+          <button class="btn" style="width:100%; margin-top:1rem; justify-content:center; font-size:0.85rem;" onclick="alert('Order placed for ${item.crop} directly with cluster escrow.')">
             <i class="fa-solid fa-cart-shopping"></i> Procure Direct
           </button>
         </div>
       `).join('');
     }
 
-    // 3. Handle Harvest Submission
+    // Handle Lot Submissions
     function handleHarvestSubmit(e) {
       e.preventDefault();
       const crop = document.getElementById('f-crop').value;
@@ -578,23 +703,21 @@
       catalog.unshift({ id: Date.now(), crop, qty, price, loc, rating: "5.0" });
       renderMarket();
 
-      // Update Dashboard Activity
       const tbody = document.getElementById('dash-activity-body');
       const row = tbody.insertRow(0);
       row.innerHTML = `<td>${loc}</td><td>${crop}</td><td>${qty.toLocaleString()} kg</td><td><span class="badge badge-blue">Aggregating</span></td>`;
 
-      alert(`Success! Harvest lot of ${qty} kg ${crop} published directly to Buyer Market.`);
+      alert(`Success! ${qty} kg of ${crop} listed to the Buyer Market.`);
       e.target.reset();
       showTab('buyer-market');
     }
 
-    // 4. CVRP Route Optimization Trigger
+    // Route Engine Run
     function runRouteOptimization() {
-      const results = document.getElementById('route-results');
-      results.style.display = 'block';
+      document.getElementById('route-results').style.display = 'block';
     }
 
-    // 5. Chart.js Forecast Initialization
+    // Chart.js Graphs
     let chartsInitialized = false;
     function initCharts() {
       if (chartsInitialized) return;
@@ -631,7 +754,7 @@
               fill: false
             },
             {
-              label: 'Mandi Traditional Spot (₹)',
+              label: 'Mandi Spot (₹)',
               data: [17, 18, 16.5, 18, 19, 18.2, 19.5],
               borderColor: '#ef4444',
               fill: false
@@ -642,7 +765,7 @@
       });
     }
 
-    // 6. AI Chatbot
+    // AI Chat
     function toggleChat() {
       const win = document.getElementById('chatWindow');
       win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
@@ -658,18 +781,17 @@
       input.value = '';
 
       setTimeout(() => {
-        let reply = "I can assist you in calculating corridor prices, grouping batches for the CVRP vehicle run, or checking Mandi floor thresholds.";
+        let reply = "I can guide you on corridor price bounds, first-mile routing clusters, or listing fresh farm lots.";
         if (text.toLowerCase().includes("price") || text.toLowerCase().includes("tomato")) {
-          reply = "The current fair floor price for Grade-A Tomato is calculated at ₹22.50/kg, ensuring a 28% margin over base APMC Mandi spot.";
+          reply = "Fair floor corridor for Grade-A Tomato is ₹22.50/kg, securing +28% over base Mandi spot.";
         } else if (text.toLowerCase().includes("route") || text.toLowerCase().includes("cvrp")) {
-          reply = "The CVRP engine clusters shipments based on capacity limits (5 MT) and geographical proximity to curb post-harvest spoilage.";
+          reply = "The CVRP engine clusters batches to keep transit degradation under 8% with grouped vehicles.";
         }
         body.innerHTML += `<div class="chat-msg bot">${reply}</div>`;
         body.scrollTop = body.scrollHeight;
       }, 400);
     }
 
-    // Initialize on load
     window.addEventListener('DOMContentLoaded', () => {
       renderMarket();
     });
