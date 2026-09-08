@@ -163,10 +163,11 @@
     header.top-bar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
+      padding: 0.85rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1rem;
     }
 
     .top-bar .breadcrumb {
@@ -179,16 +180,33 @@
       font-weight: 600;
     }
 
-    .top-bar .status-badge {
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-badge {
       font-size: 0.75rem;
       background: var(--primary-light);
       color: var(--primary-dark);
-      padding: 0.3rem 0.75rem;
+      padding: 0.4rem 0.75rem;
       border-radius: 20px;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
+    }
+
+    .user-profile-badge {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.35rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
     main.content-body {
@@ -261,7 +279,7 @@
     .badge-green { background: #dcfce7; color: #15803d; }
     .badge-blue { background: #dbeafe; color: #1d4ed8; }
 
-    /* Form Inputs */
+    /* Form Inputs & Buttons */
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
     .form-control {
@@ -275,12 +293,13 @@
     .form-control:focus { border-color: var(--primary); }
 
     .btn {
-      padding: 0.65rem 1.25rem;
+      padding: 0.6rem 1.15rem;
       background: var(--primary);
       color: #fff;
       border: none;
       border-radius: 8px;
       font-weight: 600;
+      font-size: 0.88rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -288,6 +307,91 @@
       transition: background 0.2s;
     }
     .btn:hover { background: var(--primary-dark); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover {
+      background: var(--primary-light);
+    }
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-in-out; }
+    .modal-box {
+      background: var(--surface);
+      border-radius: var(--radius);
+      width: 92%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .modal-header {
+      background: #f8fafc;
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .modal-body { padding: 1.5rem; }
+    .role-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .role-tab {
+      background: none;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+    }
+    .role-tab.active {
+      color: var(--primary-dark);
+      background: var(--primary-light);
+    }
+
+    .demo-users {
+      background: #f1f5f9;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+    .demo-users p { font-weight: 600; margin-bottom: 0.4rem; color: var(--text); }
+    .demo-chip {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-block;
+      margin: 2px;
+      font-size: 0.75rem;
+    }
+    .demo-chip:hover { border-color: var(--primary); color: var(--primary); }
 
     /* Floating Chatbot */
     .chat-widget {
@@ -392,6 +496,12 @@
         <i class="fa-solid fa-chart-line"></i>
         <span>Demand Forecast</span>
       </button>
+
+      <div class="menu-label" style="margin-top: 1rem;">Identity & Session</div>
+      <button class="nav-btn" id="sidebar-auth-btn" onclick="openLoginModal()">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span id="sidebar-auth-text">Sign In / Register</span>
+      </button>
     </div>
 
     <div class="sidebar-footer">
@@ -406,8 +516,20 @@
       <div class="breadcrumb">
         Portal / <span id="current-view-name">Dashboard</span>
       </div>
-      <div class="status-badge">
-        <i class="fa-solid fa-shield-halved"></i> Intermediary Extraction: 0% Active
+      <div class="header-actions">
+        <div class="status-badge">
+          <i class="fa-solid fa-shield-halved"></i> Intermediary Extraction: 0%
+        </div>
+        
+        <!-- Login Button & Session Badge -->
+        <button class="btn btn-outline btn-sm" id="header-login-btn" onclick="openLoginModal()">
+          <i class="fa-solid fa-user-check"></i> Sign In
+        </button>
+        <div class="user-profile-badge" id="user-profile-badge">
+          <i class="fa-solid fa-circle-user" style="color: var(--primary);"></i>
+          <span id="header-username">Kisan User</span>
+          <button class="btn btn-sm" style="padding: 0.2rem 0.5rem; margin-left: 0.3rem; background: #94a3b8;" onclick="logoutUser()">Logout</button>
+        </div>
       </div>
     </header>
 
@@ -513,6 +635,15 @@
           <p>Publish fresh harvest lots straight into the national aggregation pipeline.</p>
         </div>
 
+        <!-- Notification if logged out -->
+        <div id="auth-alert-box" style="background:#fef3c7; border:1px solid #fde68a; padding:1rem; border-radius:8px; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="color:#92400e;"><i class="fa-solid fa-triangle-exclamation"></i> Authentication Required:</strong>
+            <span style="color:#b45309; font-size:0.88rem; margin-left:4px;">Please sign in with your Kisan ID / FPO credentials to register active harvests.</span>
+          </div>
+          <button class="btn btn-sm" onclick="openLoginModal()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In Now</button>
+        </div>
+
         <div class="grid-2">
           <div class="card">
             <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> List New Harvest Batch</h3>
@@ -545,8 +676,8 @@
           <div class="card">
             <h3 style="margin-bottom: 1rem; font-size: 1.05rem;"><i class="fa-solid fa-id-card" style="color: var(--accent);"></i> Authenticated FPO Node</h3>
             <div style="background: var(--bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-              <p style="font-weight: 600; font-size: 0.9rem;">Sahyadri Farmers Cooperative Ltd.</p>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">UIDAI e-KYC: <span class="badge badge-green">Verified</span> • Mandi ID: DOCA-44821</p>
+              <p style="font-weight: 600; font-size: 0.9rem;" id="fpo-desk-name">Sahyadri Farmers Cooperative Ltd.</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted);" id="fpo-desk-status">UIDAI e-KYC: <span class="badge badge-green">Verified</span> • Mandi ID: DOCA-44821</p>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
               Lots listed via this desk automatically sync into the <strong>CVRP Route Optimization Engine</strong> for route grouping and cold-chain truck allocation.
@@ -615,6 +746,43 @@
     </main>
   </div>
 
+  <!-- ==================== LOGIN / REGISTRATION MODAL ==================== -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-key" style="color: var(--primary);"></i> KisanSetu Authentication</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeLoginModal()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="role-tabs">
+          <button class="role-tab active" id="tab-farmer" onclick="switchLoginRole('farmer')">Farmer / FPO</button>
+          <button class="role-tab" id="tab-buyer" onclick="switchLoginRole('buyer')">Bulk Buyer / Cooperative</button>
+        </div>
+
+        <form id="auth-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label id="auth-id-label">Kisan ID or Registered Mobile</label>
+            <input type="text" id="auth-id" class="form-control" placeholder="Enter 10-digit mobile or Kisan ID" required>
+          </div>
+          <div class="form-group">
+            <label>OTP / Security PIN</label>
+            <input type="password" id="auth-pin" class="form-control" placeholder="Enter 4-digit PIN (e.g. 1234)" required>
+          </div>
+          <button type="submit" class="btn" style="width: 100%; justify-content: center;">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Authenticate & Proceed
+          </button>
+        </form>
+
+        <div class="demo-users">
+          <p><i class="fa-solid fa-wand-magic-sparkles"></i> Quick Select Demo Account:</p>
+          <span class="demo-chip" onclick="quickFill('9822011223', 'Sahyadri Farmers FPO', 'farmer')">🌾 Sahyadri FPO (Farmer)</span>
+          <span class="demo-chip" onclick="quickFill('9890123456', 'Kunal Jejurkar (Farmer)', 'farmer')">👨‍🌾 Kunal Jejurkar</span>
+          <span class="demo-chip" onclick="quickFill('9422055667', 'Metro Supermarkets Wholesale', 'buyer')">🛒 Metro Mart (Buyer)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- AI Advisor Floating Bot -->
   <div class="chat-widget">
     <div class="chat-window" id="chatWindow">
@@ -647,13 +815,16 @@
       'demand-forecast': 'Demand Forecast'
     };
 
+    let currentUser = null;
+    let selectedRole = 'farmer';
+
     let catalog = [
       { id: 1, crop: "Grade-A Tomato", qty: 2400, price: 26, loc: "Nashik Cluster", rating: "4.9" },
       { id: 2, crop: "Red Onion", qty: 5000, price: 21, loc: "Lasalgaon Hub", rating: "4.8" },
       { id: 3, crop: "Green Capsicum", qty: 1200, price: 38, loc: "Pune Farm Belt", rating: "4.7" }
     ];
 
-    // Tab Switching
+    // Navigation Switching
     function showTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -673,6 +844,77 @@
       }
     }
 
+    // Modal & Auth Controls
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+
+    function switchLoginRole(role) {
+      selectedRole = role;
+      document.getElementById('tab-farmer').classList.toggle('active', role === 'farmer');
+      document.getElementById('tab-buyer').classList.toggle('active', role === 'buyer');
+      document.getElementById('auth-id-label').textContent = role === 'farmer' ? 'Kisan ID or Registered Mobile' : 'Corporate GSTIN / Buyer ID';
+      document.getElementById('auth-id').placeholder = role === 'farmer' ? 'Enter 10-digit mobile or Kisan ID' : 'e.g. 27AAAAA0000A1Z5';
+    }
+
+    function quickFill(id, name, role) {
+      switchLoginRole(role);
+      document.getElementById('auth-id').value = id;
+      document.getElementById('auth-pin').value = '1234';
+      currentUser = { name, id, role };
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const idVal = document.getElementById('auth-id').value;
+      if (!currentUser) {
+        currentUser = {
+          name: selectedRole === 'farmer' ? `Kisan #${idVal.slice(-4)}` : `Buyer #${idVal.slice(-4)}`,
+          id: idVal,
+          role: selectedRole
+        };
+      }
+
+      updateUserUI();
+      closeLoginModal();
+      alert(`Successfully signed in as ${currentUser.name} (${currentUser.role.toUpperCase()})`);
+    }
+
+    function updateUserUI() {
+      if (currentUser) {
+        document.getElementById('header-login-btn').style.display = 'none';
+        const profileBadge = document.getElementById('user-profile-badge');
+        profileBadge.style.display = 'inline-flex';
+        document.getElementById('header-username').textContent = currentUser.name;
+        
+        document.getElementById('sidebar-auth-text').textContent = 'Signed In';
+        document.getElementById('sidebar-auth-btn').onclick = () => alert(`Active session: ${currentUser.name}`);
+
+        // Update desk details if farmer
+        if (currentUser.role === 'farmer') {
+          document.getElementById('auth-alert-box').style.display = 'none';
+          document.getElementById('fpo-desk-name').textContent = currentUser.name;
+          document.getElementById('fpo-desk-status').innerHTML = `UIDAI e-KYC: <span class="badge badge-green">Verified</span> • ID: ${currentUser.id}`;
+        }
+      } else {
+        document.getElementById('header-login-btn').style.display = 'inline-flex';
+        document.getElementById('user-profile-badge').style.display = 'none';
+        document.getElementById('sidebar-auth-text').textContent = 'Sign In / Register';
+        document.getElementById('sidebar-auth-btn').onclick = openLoginModal;
+        document.getElementById('auth-alert-box').style.display = 'flex';
+      }
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      updateUserUI();
+      alert('You have logged out.');
+    }
+
     // Render Buyer Catalog
     function renderMarket() {
       const container = document.getElementById('market-listings');
@@ -685,16 +927,31 @@
           <div class="value" style="margin-top:0.75rem;">₹${item.price} <span style="font-size:0.85rem; font-weight:normal; color:var(--text-muted);">/ kg</span></div>
           <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;"><i class="fa-solid fa-location-dot"></i> ${item.loc}</p>
           <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.15rem;"><i class="fa-solid fa-boxes-stacked"></i> Batch: ${item.qty.toLocaleString()} kg</p>
-          <button class="btn" style="width:100%; margin-top:1rem; justify-content:center; font-size:0.85rem;" onclick="alert('Order placed for ${item.crop} directly with cluster escrow.')">
+          <button class="btn" style="width:100%; margin-top:1rem; justify-content:center; font-size:0.85rem;" onclick="placeOrder('${item.crop}')">
             <i class="fa-solid fa-cart-shopping"></i> Procure Direct
           </button>
         </div>
       `).join('');
     }
 
+    function placeOrder(crop) {
+      if (!currentUser) {
+        alert('Please Sign In first to lock escrow and place direct farm orders.');
+        openLoginModal();
+        return;
+      }
+      alert(`Direct procurement order locked for ${crop} under buyer account "${currentUser.name}".`);
+    }
+
     // Handle Lot Submissions
     function handleHarvestSubmit(e) {
       e.preventDefault();
+      if (!currentUser || currentUser.role !== 'farmer') {
+        alert('Authentication required: Please sign in with a Farmer or FPO account to publish inventory.');
+        openLoginModal();
+        return;
+      }
+
       const crop = document.getElementById('f-crop').value;
       const qty = parseInt(document.getElementById('f-qty').value);
       const price = parseFloat(document.getElementById('f-price').value);
@@ -781,9 +1038,11 @@
       input.value = '';
 
       setTimeout(() => {
-        let reply = "I can guide you on corridor price bounds, first-mile routing clusters, or listing fresh farm lots.";
+        let reply = "I can guide you on corridor price bounds, first-mile routing clusters, or login verification.";
         if (text.toLowerCase().includes("price") || text.toLowerCase().includes("tomato")) {
           reply = "Fair floor corridor for Grade-A Tomato is ₹22.50/kg, securing +28% over base Mandi spot.";
+        } else if (text.toLowerCase().includes("login") || text.toLowerCase().includes("account")) {
+          reply = "Click the 'Sign In' button at the top-right or sidebar to authenticate your Kisan ID or Buyer GSTIN.";
         } else if (text.toLowerCase().includes("route") || text.toLowerCase().includes("cvrp")) {
           reply = "The CVRP engine clusters batches to keep transit degradation under 8% with grouped vehicles.";
         }
